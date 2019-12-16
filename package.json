@@ -1,0 +1,10 @@
+{
+  "name": "apostrophe-i18n-pieces",
+  "version": "1.0.0",
+  "description": "Translation editable pieces with I18n",
+  "main": "index.js",
+  "author": "@apostrophecms",
+  "dependencies": {
+    "fs-extra": "^8.1.0"
+  }
+}
