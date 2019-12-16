@@ -4,7 +4,26 @@
   "description": "Translation editable pieces with I18n",
   "main": "index.js",
   "author": "@apostrophecms",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "i18n",
+    "localization",
+    "internationalization",
+    "apostrophecms",
+    "apostrophe"
+  ],
   "dependencies": {
     "fs-extra": "^8.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.7.2",
+    "eslint-config-apostrophe": "^3.0.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }
