@@ -1,4 +1,4 @@
-apos.define('apostrophe-i18n-pieces-editor-modal', {
+apos.define('apostrophe-i18n-static-editor-modal', {
   extend: 'apostrophe-pieces-editor-modal',
   construct: function(self, options) {
     var superBeforeShow = self.beforeShow;

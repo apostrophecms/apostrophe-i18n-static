@@ -1,5 +1,5 @@
 {
-  "name": "apostrophe-i18n-pieces",
+  "name": "apostrophe-i18n-static",
   "version": "1.0.0",
   "description": "Translation editable pieces with I18n",
   "main": "index.js",
