@@ -6,3 +6,5 @@ dist
 .jshintrc
 .DS_Store
 nginx/logs
+.nyc_output
+test/public
