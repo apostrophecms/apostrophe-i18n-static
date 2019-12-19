@@ -6,7 +6,8 @@
   "author": "@apostrophecms",
   "scripts": {
     "lint": "eslint .",
-    "test": "nyc mocha --timeout=10000 --exit",
+    "test": "mocha --timeout=10000 --exit",
+    "test:cover": "nyc mocha --timeout=10000 --exit",
     "test:watch": "mocha --timeout=10000 --watch"
   },
   "keywords": [

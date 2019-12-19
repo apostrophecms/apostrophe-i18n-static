@@ -92,24 +92,12 @@ module.exports = {
     };
     self.apos.i18n.configure(i18nOptions);
 
-    self.beforeInsert = async (req, piece, options, callback) => {
-      try {
-        const keyAlreadyExists = await self
-          .find(req, { key: piece.key, lang: piece.lang }, { permissions: false })
-          .toObject();
+    self.beforeInsert = (req, piece, options, callback) => {
+      piece.title = piece.key;
+      piece.published = true;
+      piece.slug = self.apos.utils.slugify(piece.key + '-' + piece.lang);
 
-        if (keyAlreadyExists) {
-          throw new Error(`Key ${piece.key} already exists`);
-        } else {
-          piece.title = piece.key;
-          piece.published = true;
-          piece.slug = self.apos.utils.slugify(piece.key + '-' + piece.lang);
-
-          return callback();
-        }
-      } catch (error) {
-        return callback(error);
-      }
+      return callback();
     };
 
     self.afterSave = async (req, piece, options, callback) => {
@@ -117,7 +105,7 @@ module.exports = {
         req.data.global = req.data.global || (await self.apos.global.findGlobal(req));
         // update global doc with random number to compare it with the next req
         // see expressMiddleware in this file
-        await self.apos.global.update(req, { ...req.data.global, i18nGeneration: new Date().getTime() });
+        await self.apos.docs.db.update({ type: 'apostrophe-global' }, { $set: { i18nGeneration: self.apos.utils.generateId() } });
         return callback();
       } catch (error) {
         return callback(error);
@@ -128,8 +116,8 @@ module.exports = {
       // compare i18n number in req and in global
       // if they don't match, it means a language had a translation piece edited
       // so need to reload this i18n language file
-      if (parseInt(req.cookies.i18nGeneration) !== req.data.global.i18nGeneration) {
-        reloadI18nFile({ locale: req.locale }, req);
+      if (req.cookies.i18nGeneration !== req.data.global.i18nGeneration) {
+        await saveI18nFile({ locale: req.locale }, req);
       }
       res.cookie('i18nGeneration', req.data.global.i18nGeneration);
       next();
@@ -140,7 +128,7 @@ module.exports = {
       'Reload i18n file, usage "node app translation:reload --locale=xx-XX"',
       async (apos, argv) => {
         const req = self.apos.tasks.getReq();
-        await reloadI18nFile(argv, req);
+        await saveI18nFile(argv, req);
       }
     );
 
@@ -148,12 +136,12 @@ module.exports = {
       const req = self.apos.tasks.getReq();
       console.time('Total time');
       for (const lang of options.locales) {
-        await reloadI18nFile({ locale: lang.value }, req);
+        await saveI18nFile({ locale: lang.value }, req);
       }
       console.timeEnd('Total time');
     });
 
-    async function reloadI18nFile(argv, req) {
+    async function saveI18nFile(argv, req) {
       if (argv.locale) {
         try {
           console.time(`${argv.locale} done in`);
