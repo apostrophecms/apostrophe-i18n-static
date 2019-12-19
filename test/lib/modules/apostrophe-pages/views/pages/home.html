@@ -1,0 +1,14 @@
+{% extends data.outerLayout %}
+
+{% block main %}
+  <div class="main-content">
+    <h3>{{ __('Hello World') }}<br>
+    {{ __n('%s cat', 1)}}<br>
+    {{ __n('%s cat', 3)}}<br>
+    {{ __n('%s dog', 1)}}<br>
+    {{ __n('%s dog', 2)}}<br>
+    {{ __('home')}}<br>
+    {{ __n('%s file', 1)}}<br>
+    {{ __n('%s file', 2)}}<br>
+  </div>
+{% endblock %}

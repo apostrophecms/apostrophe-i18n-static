@@ -1,5 +1,12 @@
 const apos = require('apostrophe')({
   modules: {
+    'apostrophe-express': {
+      csrf: false,
+      session: {
+        secret: 'test123'
+      },
+      port: 3000
+    },
     'apostrophe-i18n-static': {
       disabledKey: true,
       defaultLocale: 'en-US',

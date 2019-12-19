@@ -2,6 +2,7 @@ const fs = require('fs');
 const del = require('del');
 const mongo = require('mongodb');
 const { expect } = require('chai');
+const rp = require('request-promise');
 const { promisify } = require('util');
 const enableDestroy = require('server-destroy');
 
@@ -69,7 +70,7 @@ describe('Apostrophe-i18n-static', function() {
           valueSingular: 'test'
         });
       } catch (error) {
-        expect(error).to.match(/Key test already exists/);
+        expect(error).to.match(/E11000 duplicate key error collection: i18n-test.aposDocs index: key_1_lang_1 dup key: { key: "test", lang: "en-US" }/);
       }
     });
 
@@ -80,5 +81,16 @@ describe('Apostrophe-i18n-static', function() {
       expect(files).to.contain('en-US.json');
       expect(files).to.contain('fr-FR.json');
     });
+
+    it('should add new strings when displaying template', function (done) {
+      this.timeout(3000);
+      rp(`http://localhost:3000`).then(() => {
+        setTimeout(async function () {
+          const i18nTexts = await apos.modules['apostrophe-i18n-static'].find(req, {}).toArray()
+          expect(i18nTexts).to.be.an('array').to.have.lengthOf.at.least(5)
+          done()
+        }, 2000);
+      })
+    })
   });
 });
