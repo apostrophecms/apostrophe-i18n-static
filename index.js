@@ -92,6 +92,8 @@ module.exports = {
     };
     self.apos.i18n.configure(i18nOptions);
 
+    self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
+
     self.beforeInsert = (req, piece, options, callback) => {
       piece.title = piece.key;
       piece.published = true;
@@ -102,10 +104,21 @@ module.exports = {
 
     self.afterSave = async (req, piece, options, callback) => {
       try {
-        req.data.global = req.data.global || (await self.apos.global.findGlobal(req));
         // update global doc with random number to compare it with the next req
         // see expressMiddleware in this file
-        await self.apos.docs.db.update({ type: 'apostrophe-global' }, { $set: { i18nGeneration: self.apos.utils.generateId() } });
+        const i18nGeneration = self.apos.utils.generateId()
+        const query = { type: 'apostrophe-global' };
+
+        if (self.apos.modules['apostrophe-workflow']) {
+          query.workflowLocale = piece.lang;
+        }
+        await self.apos.docs.db.update(query, { $set: { i18nGeneration } });
+
+        if (self.apos.modules['apostrophe-workflow']) {
+          query.workflowLocale = piece.lang + '-draft';
+          await self.apos.docs.db.update(query, { $set: { i18nGeneration } });
+        }
+
         return callback();
       } catch (error) {
         return callback(error);
@@ -117,7 +130,8 @@ module.exports = {
       // if they don't match, it means a language had a translation piece edited
       // so need to reload this i18n language file
       if (req.cookies.i18nGeneration !== req.data.global.i18nGeneration) {
-        await saveI18nFile({ locale: req.locale }, req);
+        const locale = self.getLocale(req);
+        await saveI18nFile({ locale }, req);
       }
       res.cookie('i18nGeneration', req.data.global.i18nGeneration);
       next();
@@ -125,7 +139,7 @@ module.exports = {
 
     self.addTask(
       'reload',
-      'Reload i18n file, usage "node app translation:reload --locale=xx-XX"',
+      'Reload i18n file, usage "node app apostrophe-i18n-static:reload --locale=xx-XX"',
       async (apos, argv) => {
         const req = self.apos.tasks.getReq();
         await saveI18nFile(argv, req);
