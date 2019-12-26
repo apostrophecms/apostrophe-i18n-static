@@ -92,6 +92,18 @@ module.exports = {
     };
     self.apos.i18n.configure(i18nOptions);
 
+    /* apostrophe-workflow exclusion start */
+    self.excludeType = () => {
+      const workflow = self.apos.modules['apostrophe-workflow'];
+      if (workflow) {
+        workflow.excludeTypes.push(self.name);
+      }
+    };
+
+    self.modulesReady = () => (self.excludeType());
+    /* apostrophe-workflow exclusion end */
+
+
     self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
 
     self.beforeInsert = (req, piece, options, callback) => {

@@ -12,6 +12,8 @@ This module adds editable pieces for translation through i18n to an Apostrophe p
 
 It is intendend to localize static text in templates i.e text wrapped with `__("...')`, not localize editable content. If your goal is content localization, you should use the [Apostrophe workflow module](https://github.com/apostrophecms/apostrophe-workflow) instead.
 
+I18n static pieces are excluded from apostrophe-workflow.
+
 For static text localization, you are in the right place.
 
 ---
