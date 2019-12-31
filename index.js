@@ -93,14 +93,12 @@ module.exports = {
     self.apos.i18n.configure(i18nOptions);
 
     /* apostrophe-workflow exclusion start */
-    self.excludeType = () => {
+    self.on('apostrophe:modulesReady', 'excludeType', () => {
       const workflow = self.apos.modules['apostrophe-workflow'];
       if (workflow) {
         workflow.excludeTypes.push(self.name);
       }
-    };
-
-    self.modulesReady = () => (self.excludeType());
+    });
     /* apostrophe-workflow exclusion end */
 
 
@@ -141,11 +139,11 @@ module.exports = {
       // compare i18n number in req and in global
       // if they don't match, it means a language had a translation piece edited
       // so need to reload this i18n language file
-      if (req.cookies.i18nGeneration !== req.data.global.i18nGeneration) {
+      if (self.lastI18nGeneration !== req.data.global.i18nGeneration) {
         const locale = self.getLocale(req);
-        await saveI18nFile({ locale }, req);
+        await saveI18nFile({ locale });
       }
-      res.cookie('i18nGeneration', req.data.global.i18nGeneration);
+      self.lastI18nGeneration = req.data.global.i18nGeneration
       next();
     };
 
@@ -154,7 +152,7 @@ module.exports = {
       'Reload i18n file, usage "node app apostrophe-i18n-static:reload --locale=xx-XX"',
       async (apos, argv) => {
         const req = self.apos.tasks.getReq();
-        await saveI18nFile(argv, req);
+        await saveI18nFile(argv);
       }
     );
 
@@ -162,12 +160,12 @@ module.exports = {
       const req = self.apos.tasks.getReq();
       console.time('Total time');
       for (const lang of options.locales) {
-        await saveI18nFile({ locale: lang.value }, req);
+        await saveI18nFile({ locale: lang.value });
       }
       console.timeEnd('Total time');
     });
 
-    async function saveI18nFile(argv, req) {
+    async function saveI18nFile(argv) {
       if (argv.locale) {
         try {
           console.time(`${argv.locale} done in`);
@@ -176,6 +174,7 @@ module.exports = {
           const file = localesDir + '/' + argv.locale + '.json';
           await fs.ensureFile(file);
 
+          const req = self.apos.tasks.getAnonReq();
           const pieces = await self
             .find(req, { published: true, lang: argv.locale }, { key: 1, valueSingular: 1, valuePlural: 1 })
             .toArray();
