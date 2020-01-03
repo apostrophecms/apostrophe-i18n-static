@@ -83,10 +83,16 @@ module.exports = {
   },
 
   async construct(self, options) {
+    const defaults = {
+      disabledKey: false,
+      autoReload: true
+    };
+    options = Object.assign({}, defaults, options);
+
     const { apos, ...apostropheI18nOptions } = self.apos.modules['apostrophe-i18n'].options;
     const i18nOptions = {
       ...apostropheI18nOptions,
-      autoReload: true,
+      autoReload: options.autoReload,
       locales: options.locales.map(lang => lang.value),
       defaultLocale: options.defaultLocale
     };
@@ -100,7 +106,6 @@ module.exports = {
       }
     });
     /* apostrophe-workflow exclusion end */
-
 
     self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
 
@@ -116,7 +121,7 @@ module.exports = {
       try {
         // update global doc with random number to compare it with the next req
         // see expressMiddleware in this file
-        const i18nGeneration = self.apos.utils.generateId()
+        const i18nGeneration = self.apos.utils.generateId();
         const query = { type: 'apostrophe-global' };
 
         if (self.apos.modules['apostrophe-workflow']) {
@@ -139,25 +144,21 @@ module.exports = {
       // compare i18n number in req and in global
       // if they don't match, it means a language had a translation piece edited
       // so need to reload this i18n language file
-      if (self.lastI18nGeneration !== req.data.global.i18nGeneration) {
+      if (options.autoReload && self.lastI18nGeneration !== req.data.global.i18nGeneration) {
         const locale = self.getLocale(req);
         await saveI18nFile({ locale });
       }
-      self.lastI18nGeneration = req.data.global.i18nGeneration
+      self.lastI18nGeneration = req.data.global.i18nGeneration;
       next();
     };
 
     self.addTask(
       'reload',
       'Reload i18n file, usage "node app apostrophe-i18n-static:reload --locale=xx-XX"',
-      async (apos, argv) => {
-        const req = self.apos.tasks.getReq();
-        await saveI18nFile(argv);
-      }
+      (apos, argv) => saveI18nFile(argv)
     );
 
     self.addTask('reload-all', 'Reload all i18n files', async () => {
-      const req = self.apos.tasks.getReq();
       console.time('Total time');
       for (const lang of options.locales) {
         await saveI18nFile({ locale: lang.value });

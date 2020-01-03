@@ -6,7 +6,7 @@
   "author": "@apostrophecms",
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha --timeout=10000 --exit",
+    "test": "npm run lint && mocha --timeout=10000 --exit",
     "test:cover": "nyc mocha --timeout=10000 --exit",
     "test:watch": "mocha --timeout=10000 --watch"
   },

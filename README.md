@@ -78,7 +78,9 @@ require('apostrophe')({
 ```
 This will create the corresponding JSON files in the `locales` folder of the project (or the `localesDir` defined in `apostrophe-i18n` module). The format of the locales can be anything (`en-US` in this example, but could have been `en` or other format fitting your needs).
 
-Another option is `disabledKey`. By default, it is `false`. When `true`, it will render the `key` field as "disabled" to inform users the key should not be modified.
+Other options are:
+- `disabledKey`: default `false`. When `true`, it will render the `key` field as "disabled" to inform users the key should not be modified.
+- `autoReload`: default `true`. When `false`, it will not reload JSON files when a translation piece is edited.
 
 Options from `apostrophe-i18n` module are taken into account, except `locales` and `defaultLocale`.
 

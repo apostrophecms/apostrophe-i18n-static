@@ -86,11 +86,11 @@ describe('Apostrophe-i18n-static', function() {
       this.timeout(3000);
       rp(`http://localhost:3000`).then(() => {
         setTimeout(async function () {
-          const i18nTexts = await apos.modules['apostrophe-i18n-static'].find(req, {}).toArray()
-          expect(i18nTexts).to.be.an('array').to.have.lengthOf.at.least(5)
-          done()
+          const i18nTexts = await apos.modules['apostrophe-i18n-static'].find(req, {}).toArray();
+          expect(i18nTexts).to.be.an('array').to.have.lengthOf.at.least(5);
+          done();
         }, 2000);
-      })
-    })
+      });
+    });
   });
 });
