@@ -125,14 +125,9 @@ module.exports = {
         const query = { type: 'apostrophe-global' };
 
         if (self.apos.modules['apostrophe-workflow']) {
-          query.workflowLocale = piece.lang;
+          query.workflowLocale = { $in: [piece.lang, piece.lang + '-draft'] };
         }
-        await self.apos.docs.db.update(query, { $set: { i18nGeneration } });
-
-        if (self.apos.modules['apostrophe-workflow']) {
-          query.workflowLocale = piece.lang + '-draft';
-          await self.apos.docs.db.update(query, { $set: { i18nGeneration } });
-        }
+        await self.apos.docs.db.update(query, { $set: { i18nGeneration } }, { multi: true });
 
         return callback();
       } catch (error) {
