@@ -83,6 +83,7 @@ module.exports = {
   },
 
   async construct(self, options) {
+    const i18nCache = self.apos.caches.get('i18n-static');
     const defaults = {
       disabledKey: false,
       autoReload: true
@@ -128,6 +129,7 @@ module.exports = {
           query.workflowLocale = { $in: [piece.lang, piece.lang + '-draft'] };
         }
         await self.apos.docs.db.update(query, { $set: { i18nGeneration } }, { multi: true });
+        await i18nCache.set(piece.lang, {});
 
         return callback();
       } catch (error) {
@@ -147,35 +149,26 @@ module.exports = {
       next();
     };
 
-    self.addTask(
-      'reload',
-      'Reload i18n file, usage "node app apostrophe-i18n-static:reload --locale=xx-XX"',
-      (apos, argv) => saveI18nFile(argv)
-    );
-
-    self.addTask('reload-all', 'Reload all i18n files', async () => {
-      console.time('Total time');
-      for (const lang of options.locales) {
-        await saveI18nFile({ locale: lang.value });
-      }
-      console.timeEnd('Total time');
-    });
-
     async function saveI18nFile(argv) {
       if (argv.locale) {
         try {
           console.time(`${argv.locale} done in`);
           console.log('Generating i18n file for', inspect(argv.locale, { colors: true }));
+
+          let translations = await i18nCache.get(argv.locale) || {};
           const localesDir = self.apos.modules['apostrophe-i18n'].options.directory;
           const file = localesDir + '/' + argv.locale + '.json';
           await fs.ensureFile(file);
 
-          const req = self.apos.tasks.getAnonReq();
-          const pieces = await self
-            .find(req, { published: true, lang: argv.locale }, { key: 1, valueSingular: 1, valuePlural: 1 })
-            .toArray();
+          if (Object.entries(translations).length === 0) {
+            const req = self.apos.tasks.getAnonReq();
+            const pieces = await self
+              .find(req, { published: true, lang: argv.locale }, { key: 1, valueSingular: 1, valuePlural: 1 })
+              .toArray();
+            translations = translatePieces(pieces);
 
-          const translations = translatePieces(pieces);
+            await i18nCache.set(argv.locale, translations);
+          }
 
           // avoid simultaneous writing with apostrophe lock
           await self.apos.locks.withLock(
@@ -204,6 +197,14 @@ module.exports = {
         return acc;
       }, {});
     }
+
+    self.on('apostrophe:modulesReady', 'generateJSONs', async function() {
+      console.time('Total time');
+      for (const lang of options.locales) {
+        await saveI18nFile({ locale: lang.value });
+      }
+      console.timeEnd('Total time');
+    });
   },
 
   async afterConstruct(self) {

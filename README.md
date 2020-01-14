@@ -90,24 +90,21 @@ Options from `apostrophe-i18n` module are taken into account, except `locales` a
 
 As explained above, JSON files should not be edited directly because the reloading of i18n files is made after a translation piece has been edited. To be more accurate, if there are 2 JSON files (for example `en.json` and `fr.json`), if an `apostrophe-i18n-static` piece is edited for the `en` locale, only the `en.json` file will be regenerated.
 
-Therefore, if one chooses to commit the JSON files into a Git repository to keep the latest translations, it is not mandatory as there are apostrophe tasks to recreate the JSON files (but Git `commit` can be a way to trace editions history if needed).
+Also, at startup, all JSON files are regenerated automatically, based on the cache if it exists, otherwise from the database values (see [3.2 Performance](#3-2)).
 
-### 3.1 Apostrophe tasks
+<a id="3-1"></a>
 
-If files need to be regenerated, 2 tasks have been defined:
-
-- `node app apostrophe-i18n-static:reload --locale=xx` where `xx` is a valid i18n file name. It generates only the file for the specified locale.
-- `node app apostrophe-i18n-static:reload-all` finds every locale and generate files (see list of files in `locales` directory).
-
-These tasks can be run during a server startup (or Docker build) to always have up-to-date translations.
-
-### 3.2 Distributed system
+### 3.1 Distributed system
 
 This module has been designed to work with several running Apostrophe instances sharing the same DB (or a MongoDB sharded cluster). In a docker environnement, if a translation piece is edited on one instance, its JSON file is regenerated inside its container and a new random ID is stored into the DB. This way, the next request coming from the other instance will detect there was a change (due to the new random ID) and regenerate its JSON files too. As a consequence, translations are always up-to-date.
 
-### 3.3 Performance
+<a id="3-2"></a>
+
+### 3.2 Performance
 
 As a general idea, the regeneration of a file containing several hundred translations takes usually a few milliseconds. Every reload is measured and displayed on the standard output.
+
+However, to be sure it scales smoothly, a cache strategy has been implemented. Every edition on a translation piece empties the cache for the edited locale. The next request reloads the JSON file from the database in this case. Otherwise, it is pulled from the cache (useful at startup).
 
 
 <a id="4"></a>
