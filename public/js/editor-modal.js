@@ -5,7 +5,7 @@ apos.define('apostrophe-i18n-static-editor-modal', {
     self.beforeShow = function(callback) {
       options.schema.forEach(function(field) {
         if (field.disabled) {
-          // disable visually a field markes as "disabled" in the schema to block modifications
+          // disable visually a field marked as "disabled" in the schema to block modifications
           // done for the "key" field mostly
           var $name = apos.schemas.findField(self.$el, field.name);
           $name.attr('disabled', true);

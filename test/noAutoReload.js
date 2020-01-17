@@ -9,7 +9,6 @@ const enableDestroy = require('server-destroy');
 let apos;
 let req;
 before(function(done) {
-  this.timeout(5200);
   apos = require('./appWithoutAutoReload.js');
   setTimeout(() => {
     req = apos.tasks.getReq();
@@ -17,7 +16,7 @@ before(function(done) {
   }, 5000);
 });
 
-after(async () => {
+after(async function() {
   const server = apos.app.listen();
   enableDestroy(server);
   server.destroy();
@@ -30,8 +29,7 @@ after(async () => {
 describe('Apostrophe-i18n-static', function() {
   describe('#no auto reload', function() {
 
-    it('should insert a piece', async () => {
-      this.timeout(3000);
+    it('should insert a piece', async function () {
       const asyncReadFile = promisify(fs.readFile);
       const asyncWriteFile = promisify(fs.writeFile);
 
@@ -49,7 +47,6 @@ describe('Apostrophe-i18n-static', function() {
       // see configuration in appWithoutAutoReload.js
       await rp(`http://localhost:3000`);
       const file = JSON.parse(await asyncReadFile('./test/locales/en-US.json', { encoding: 'utf8' }));
-
       expect(file).to.have.property('test2', 'test');
     });
   });

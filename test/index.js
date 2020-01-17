@@ -1,5 +1,5 @@
-const fs = require('fs');
 const del = require('del');
+const fs = require('fs-extra');
 const mongo = require('mongodb');
 const { expect } = require('chai');
 const rp = require('request-promise');
@@ -8,13 +8,12 @@ const enableDestroy = require('server-destroy');
 
 let apos;
 let req;
-before(function(done) {
-  this.timeout(5200);
+before(async function() {
+  await fs.ensureSymlink('./index.js', 'test/lib/modules/apostrophe-i18n-static/index.js');
+  await fs.ensureSymlink('./lib/modules/apostrophe-i18n-templates/index.js', 'test/lib/modules/apostrophe-i18n-static/lib/modules/apostrophe-i18n-templates/index.js');
+  // this.timeout(5200);
   apos = require('./app');
-  setTimeout(() => {
-    req = apos.tasks.getReq();
-    done();
-  }, 5000);
+  setTimeout(() => (req = apos.tasks.getReq()), 5000);
 });
 
 after(async () => {
@@ -77,20 +76,8 @@ describe('Apostrophe-i18n-static', function() {
     it('should create JSON files', async () => {
       const asyncReaddir = promisify(fs.readdir);
       const files = await asyncReaddir('./test/locales');
-
       expect(files).to.contain('en-US.json');
       expect(files).to.contain('fr-FR.json');
-    });
-
-    it('should add new strings when displaying template', function (done) {
-      this.timeout(3000);
-      rp(`http://localhost:3000`).then(() => {
-        setTimeout(async function () {
-          const i18nTexts = await apos.modules['apostrophe-i18n-static'].find(req, {}).toArray();
-          expect(i18nTexts).to.be.an('array').to.have.lengthOf.at.least(5);
-          done();
-        }, 2000);
-      });
     });
   });
 });
