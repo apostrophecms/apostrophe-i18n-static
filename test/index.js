@@ -2,7 +2,6 @@ const del = require('del');
 const fs = require('fs-extra');
 const mongo = require('mongodb');
 const { expect } = require('chai');
-const rp = require('request-promise');
 const { promisify } = require('util');
 const enableDestroy = require('server-destroy');
 
@@ -11,7 +10,6 @@ let req;
 before(async function() {
   await fs.ensureSymlink('./index.js', 'test/lib/modules/apostrophe-i18n-static/index.js');
   await fs.ensureSymlink('./lib/modules/apostrophe-i18n-templates/index.js', 'test/lib/modules/apostrophe-i18n-static/lib/modules/apostrophe-i18n-templates/index.js');
-  // this.timeout(5200);
   apos = require('./app');
   setTimeout(() => (req = apos.tasks.getReq()), 5000);
 });

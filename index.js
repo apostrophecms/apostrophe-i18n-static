@@ -160,6 +160,7 @@ module.exports = {
           const file = localesDir + '/' + argv.locale + '.json';
           await fs.ensureFile(file);
 
+          // create cache
           if (Object.entries(translations).length === 0) {
             const req = self.apos.tasks.getAnonReq();
             const pieces = await self
@@ -167,7 +168,9 @@ module.exports = {
               .toArray();
             translations = translatePieces(pieces);
 
-            await i18nCache.set(argv.locale, translations);
+            if (Object.entries(translations).length) { // avoid duplicate key error if empty
+              await i18nCache.set(argv.locale, translations);
+            }
           }
 
           // avoid simultaneous writing with apostrophe lock
