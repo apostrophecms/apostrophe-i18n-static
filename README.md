@@ -118,19 +118,19 @@ Example of project configuration using `apostrophe-i18n-static` and `apostrophe-
 const locales = [
   {
     label: 'German',
-    value: 'de-DE',
+    value: 'de-DE'
   },
   {
     label: 'English',
-    value: 'en-US',
+    value: 'en-US'
   },
   {
     label: 'Spanish',
-    value: 'es-ES',
+    value: 'es-ES'
   },
   {
     label: 'French',
-    value: 'fr-FR',
+    value: 'fr-FR'
   }
 ];
 
@@ -153,3 +153,86 @@ require('apostrophe')({
 ```
 
 The displayed translations will be taken from current worflow locale. For example, if the user is on the `es-ES` (or `es-ES-draft`) locale according to apostrophe-worflow, translations coming from `es-ES.json` will be displayed.
+
+In case of nested locales with apostrophe-workflow, apostrophe-i18n-static will still work. It just needs a flat structure.
+
+```js
+const defaultLocale = 'en-US';
+
+const apos = require('apostrophe')({
+  modules: {
+    shortName: 'apostrophe-test',
+    'apostrophe-i18n-static': {
+      disabledKey: true,
+      defaultLocale,
+      locales: [
+        {
+          label: 'English',
+          value: 'en-US'
+        },
+        {
+          label: 'Spanish',
+          value: 'es-ES'
+        },
+        {
+          label: 'French',
+          value: 'fr-FR'
+        },
+        {
+          label: 'German',
+          value: 'de-DE'
+        },
+        {
+          label: 'Austrian',
+          value: 'de-AT'
+        },
+        {
+          label: 'Swiss',
+          value: 'de-CH'
+        }
+      ]
+    },
+    'apostrophe-workflow': {
+      alias: 'workflow',
+      locales: [
+        {
+          label: 'Master',
+          name: 'master',
+          private: true,
+          children: [
+            {
+              label: 'English',
+              name: 'en-US'
+            },
+            {
+              label: 'Spanish',
+              name: 'es-ES'
+            },
+            {
+              label: 'French',
+              name: 'fr-FR'
+            },
+            {
+              label: 'Germany',
+              name: 'de-DE'
+              children: [
+                {
+                  label: 'Austria',
+                  name: 'de-AT'
+                },
+                {
+                  label: 'Switzerland',
+                  name: 'de-CH'
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      defaultLocale
+    }
+  }
+});
+```
+
+It is important to have the same `defaultLocale`.
