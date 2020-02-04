@@ -11,7 +11,7 @@ This module adds editable pieces for translation through i18n to an Apostrophe p
 
 :warning: **Warning!!!** :warning:
 
-It is intendend to localize static text in templates i.e text wrapped with `__("...')`, not localize editable content. If your goal is content localization, you should use the [Apostrophe workflow module](https://github.com/apostrophecms/apostrophe-workflow) instead.
+It is intendend to localize static text in templates i.e text wrapped with `__("...")`, not localize editable content. If your goal is content localization, you should use the [Apostrophe workflow module](https://github.com/apostrophecms/apostrophe-workflow) instead.
 
 I18n static pieces are excluded from apostrophe-workflow. To use both `apostrophe-i18n-static` and `apostrophe-workflow`, see [Usage with apostrophe-workflow](#4)
 
@@ -29,7 +29,7 @@ This will add an entry in the admin bar "I18n static" and pieces will have a sch
 
 ![schema](apostrophe-i18n-pieces-schema.png)
 
-The first time a template containing a new string to translate through `__("...')` is rendered, the piece is created in the database. When the value of this piece is edited, the matching JSON file is recreated. Therefore, do **NOT** edit directly the JSON files.
+The first time a template containing a new string to translate through `__("...")` is rendered, the piece is created in the database. When the value of this piece is edited, the matching JSON file is recreated. Therefore, do **NOT** edit directly the JSON files.
 
 <a id="1"></a>
 
