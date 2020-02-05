@@ -84,29 +84,6 @@ module.exports = {
 
   async construct(self, options) {
     const i18nCache = self.apos.caches.get('i18n-static');
-    const defaults = {
-      disabledKey: false,
-      autoReload: true
-    };
-    options = Object.assign({}, defaults, options);
-
-    const { apos, ...apostropheI18nOptions } = self.apos.modules['apostrophe-i18n'].options;
-    const i18nOptions = {
-      ...apostropheI18nOptions,
-      autoReload: options.autoReload,
-      locales: options.locales.map(lang => lang.value),
-      defaultLocale: options.defaultLocale
-    };
-    self.apos.i18n.configure(i18nOptions);
-
-    /* apostrophe-workflow exclusion start */
-    self.on('apostrophe:modulesReady', 'excludeType', () => {
-      const workflow = self.apos.modules['apostrophe-workflow'];
-      if (workflow) {
-        workflow.excludeTypes.push(self.name);
-      }
-    });
-    /* apostrophe-workflow exclusion end */
 
     self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
 
@@ -188,18 +165,48 @@ module.exports = {
     }
 
     function translatePieces(pieces) {
-      return pieces.reduce((acc, cur) => {
-        if (cur.valuePlural) {
-          acc[cur.key] = {
-            one: cur.valueSingular,
-            other: cur.valuePlural
-          };
-        } else {
-          acc[cur.key] = cur.valueSingular;
+      function nest(obj, keys, val) {
+        const key = keys.shift();
+        if (key) {
+          obj[key] = keys.length ? nest(obj[key] || {}, keys, val) : val;
         }
-        return acc;
+        return obj;
+      };
+
+      return pieces.reduce((acc, cur) => {
+        const keys = options.objectNotation ? cur.key.split(options.objectNotation) : [cur.key];
+
+        if (cur.valuePlural) {
+          return nest(acc, keys, { one: cur.valueSingular, other: cur.valuePlural });
+        } else {
+          return nest(acc, keys, cur.valueSingular);
+        }
       }, {});
     }
+
+    // wait for "modulesReady" event to reconfigure apostrophe-i18n
+    self.on('apostrophe:modulesReady', 'configure', function() {
+      const defaults = {
+        autoReload: true,
+        disabledKey: false,
+        objectNotation: false
+      };
+      options = Object.assign({}, defaults, options);
+
+      if (options.objectNotation === true) { // important: only when boolean "true"
+        options.objectNotation = '.'
+      }
+
+      const { apos, ...apostropheI18nOptions } = self.apos.modules['apostrophe-i18n'].options;
+      const i18nOptions = {
+        ...apostropheI18nOptions,
+        autoReload: options.autoReload,
+        defaultLocale: options.defaultLocale,
+        objectNotation: options.objectNotation,
+        locales: options.locales.map(lang => lang.value)
+      };
+      self.apos.i18n.configure(i18nOptions);
+    });
 
     self.on('apostrophe:modulesReady', 'generateJSONs', async function() {
       console.time('Total time');
@@ -208,6 +215,15 @@ module.exports = {
       }
       console.timeEnd('Total time');
     });
+
+    /* apostrophe-workflow exclusion start */
+    self.on('apostrophe:modulesReady', 'excludeType', () => {
+      const workflow = self.apos.modules['apostrophe-workflow'];
+      if (workflow) {
+        workflow.excludeTypes.push(self.name);
+      }
+    });
+    /* apostrophe-workflow exclusion end */
   },
 
   async afterConstruct(self) {
