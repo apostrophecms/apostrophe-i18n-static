@@ -7,11 +7,9 @@ const { promisify } = require('util');
 const enableDestroy = require('server-destroy');
 
 let apos;
-let req;
 before(function(done) {
-  apos = require('./appWithoutAutoReload.js');
+  apos = require('./appWithObjectNotation.js');
   setTimeout(() => {
-    req = apos.tasks.getReq();
     done();
   }, 10000);
 });
@@ -27,27 +25,14 @@ after(async function() {
 });
 
 describe('Apostrophe-i18n-static', function() {
-  describe('#no auto reload', function() {
+  describe('#object notation', function() {
 
-    it('should insert a piece', async function () {
+    it('should convert object notation string to nested object in JSON file', async function () {
       const asyncReadFile = promisify(fs.readFile);
-      const asyncWriteFile = promisify(fs.writeFile);
 
-      // add a value in JSON
-      await asyncWriteFile('./test/locales/en-US.json', JSON.stringify({ test2: 'test' }));
-
-      // modify the value in db
-      await apos.modules['apostrophe-i18n-static'].insert(req, {
-        lang: 'en-US',
-        key: 'test2',
-        valueSingular: 'test2'
-      });
-
-      // even after visiting a template, JSON is not generated due to "autoReload: false" option in apos
-      // see configuration in appWithoutAutoReload.js
-      await rp('http://localhost:3000');
+      await rp('http://localhost:3000/object');
       const file = JSON.parse(await asyncReadFile('./test/locales/en-US.json', { encoding: 'utf8' }));
-      expect(file).to.have.property('test2', 'test');
+      expect(file).to.have.deep.property('deep', { nested: { val: 'nested value' } });
     });
   });
 });

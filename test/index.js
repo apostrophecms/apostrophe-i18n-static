@@ -11,7 +11,7 @@ before(async function() {
   await fs.ensureSymlink('./index.js', 'test/lib/modules/apostrophe-i18n-static/index.js');
   await fs.ensureSymlink('./lib/modules/apostrophe-i18n-templates/index.js', 'test/lib/modules/apostrophe-i18n-static/lib/modules/apostrophe-i18n-templates/index.js');
   apos = require('./app');
-  setTimeout(() => (req = apos.tasks.getReq()), 5000);
+  setTimeout(() => (req = apos.tasks.getReq()), 10000);
 });
 
 after(async () => {

@@ -194,7 +194,7 @@ module.exports = {
       options = Object.assign({}, defaults, options);
 
       if (options.objectNotation === true) { // important: only when boolean "true"
-        options.objectNotation = '.'
+        options.objectNotation = '.';
       }
 
       const { apos, ...apostropheI18nOptions } = self.apos.modules['apostrophe-i18n'].options;
