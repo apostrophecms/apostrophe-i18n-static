@@ -75,8 +75,7 @@ module.exports = {
     options.addFilters = [
       {
         name: 'lang',
-        label: 'Language',
-        def: options.defaultLocale
+        label: 'Language'
       },
       ...(options.addFilters || [])
     ];
@@ -86,6 +85,12 @@ module.exports = {
     const i18nCache = self.apos.caches.get('i18n-static');
 
     self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
+
+    const superPageBeforeSend = self.pageBeforeSend;
+    self.pageBeforeSend = (req) => {
+      req.browserCall('window.locale=?', self.getLocale(req));
+      superPageBeforeSend(req);
+    };
 
     self.beforeInsert = (req, piece, options, callback) => {
       piece.title = piece.key;
