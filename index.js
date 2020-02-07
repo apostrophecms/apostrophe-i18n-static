@@ -17,7 +17,7 @@ module.exports = {
         name: 'lang',
         label: 'Language',
         type: 'select',
-        choices: options.locales,
+        choices: 'getLocales',
         required: true
       },
       {
@@ -85,6 +85,9 @@ module.exports = {
     const i18nCache = self.apos.caches.get('i18n-static');
 
     self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
+
+    // need to populate "lang.choices" field with this function when apostrophe-workflow is used with "useWorkflowLocales" option
+    self.getLocales = () => options.locales.sort(function (a, b) { return a.label.localeCompare(b.label); });
 
     const superPageBeforeSend = self.pageBeforeSend;
     self.pageBeforeSend = (req) => {
@@ -189,17 +192,36 @@ module.exports = {
       }, {});
     }
 
+    function flattenedLocales(parentLocales = [], flattenedLocalesArray = []) {
+      for (const parentLocale of parentLocales) {
+        flattenedLocalesArray.push({
+          label: parentLocale.label,
+          value: parentLocale.name
+        });
+        if (parentLocale.children) {
+          flattenedLocalesArray = flattenedLocales(parentLocale.children, flattenedLocalesArray);
+        }
+      }
+      return flattenedLocalesArray;
+    }
+
     // wait for "modulesReady" event to reconfigure apostrophe-i18n
     self.on('apostrophe:modulesReady', 'configure', function() {
       const defaults = {
         autoReload: true,
         disabledKey: false,
-        objectNotation: false
+        objectNotation: false,
+        useWorkflowLocales: false
       };
       options = Object.assign({}, defaults, options);
 
       if (options.objectNotation === true) { // important: only when boolean "true"
         options.objectNotation = '.';
+      }
+
+      const workflow = self.apos.modules['apostrophe-workflow'];
+      if (workflow && options.useWorkflowLocales) {
+        options.locales = flattenedLocales(workflow.options.locales);
       }
 
       const { apos, ...apostropheI18nOptions } = self.apos.modules['apostrophe-i18n'].options;
