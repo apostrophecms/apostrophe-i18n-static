@@ -211,6 +211,7 @@ module.exports = {
         autoReload: true,
         disabledKey: false,
         objectNotation: false,
+        generateAtStartup: true,
         useWorkflowLocales: false
       };
       options = Object.assign({}, defaults, options);
@@ -236,11 +237,13 @@ module.exports = {
     });
 
     self.on('apostrophe:modulesReady', 'generateJSONs', async function() {
-      console.time('Total time');
-      for (const lang of options.locales) {
-        await saveI18nFile({ locale: lang.value });
+      if (options.generateAtStartup) {
+        console.time('Total time');
+        for (const lang of options.locales) {
+          await saveI18nFile({ locale: lang.value });
+        }
+        console.timeEnd('Total time');
       }
-      console.timeEnd('Total time');
     });
 
     /* apostrophe-workflow exclusion start */
@@ -251,6 +254,20 @@ module.exports = {
       }
     });
     /* apostrophe-workflow exclusion end */
+
+    self.addTask(
+      'reload',
+      'Reload i18n file, usage "node app apostrophe-i18n-static:reload --locale=xx-XX"',
+      (apos, argv) => saveI18nFile(argv)
+    );
+
+    self.addTask('reload-all', 'Reload all i18n files', async () => {
+      console.time('Total time');
+      for (const lang of options.locales) {
+        await saveI18nFile({ locale: lang.value });
+      }
+      console.timeEnd('Total time');
+    });
   },
 
   async afterConstruct(self) {
