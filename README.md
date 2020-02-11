@@ -81,6 +81,7 @@ This will create the corresponding JSON files in the `locales` folder of the pro
 Other options are:
 - `disabledKey`: default `false`. When `true`, it will render the `key` field as "disabled" to inform users the key should not be modified.
 - `autoReload`: default `true`. When `false`, it will not reload JSON files when a translation piece is edited.
+- `generateAtStartup`: default `true`. When `false`, JSON files are not generated automatically at startup.
 - `objectNotation`: default `false`. As in `i18n`, when `true`, the separator will be `.`. Otherwise, it will take `objectNotation` value. For example, `objectNotation: '-'` will convert `obj-with-deep-val` into
 
 ```js
