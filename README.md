@@ -82,6 +82,7 @@ Other options are:
 - `disabledKey`: default `false`. When `true`, it will render the `key` field as "disabled" to inform users the key should not be modified.
 - `autoReload`: default `true`. When `false`, it will not reload JSON files when a translation piece is edited.
 - `generateAtStartup`: default `true`. When `false`, JSON files are not generated automatically at startup.
+- `useWorkflowLocales`: default `false`. If `true`, it uses `apostrophe-workflow` `locales` array (must have installed and configured `apostrophe-workflow` before - see 4. [Usage with apostrophe-workflow](#4)). In this case, the `locales` array from `apostrophe-i18n-static` module is not used.
 - `objectNotation`: default `false`. As in `i18n`, when `true`, the separator will be `.`. Otherwise, it will take `objectNotation` value. For example, `objectNotation: '-'` will convert `obj-with-deep-val` into
 
 ```js
@@ -269,3 +270,56 @@ const apos = require('apostrophe')({
 ```
 
 It is important to have the same `defaultLocale`.
+
+Or `apostrophe-i18n-static` can use the locales from `apostrophe-workflow` by using the option `useWorkflowLocales`:
+
+```js
+const apos = require('apostrophe')({
+  modules: {
+    shortName: 'apostrophe-test',
+    'apostrophe-i18n-static': {
+      defaultLocale: 'en-US',
+      useWorkflowLocales: true
+    },
+    'apostrophe-workflow': {
+      alias: 'workflow',
+      defaultLocale: 'en-US',
+      locales: [
+        {
+          label: 'Master',
+          name: 'master',
+          private: true,
+          children: [
+            {
+              label: 'English',
+              name: 'en-US',
+            },
+            {
+              label: 'Spanish',
+              name: 'es-ES',
+            },
+            {
+              label: 'French',
+              name: 'fr-FR',
+            },
+            {
+              label: 'Germany',
+              name: 'de-DE',
+              children: [
+                {
+                  label: 'Austria',
+                  name: 'de-AT'
+                },
+                {
+                  label: 'Switzerland',
+                  name: 'de-CH'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+});
+```
