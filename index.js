@@ -47,7 +47,7 @@ module.exports = {
       {
         name: 'basics',
         label: 'Basics',
-        fields: ['lang', 'key', 'title', 'valueSingular', 'valuePlural']
+        fields: ['lang', 'key', 'title', 'valueSingular', 'valuePlural', 'trash']
       },
       ...(options.arrangeFields || [])
     ];
@@ -228,6 +228,7 @@ module.exports = {
       const { apos, ...apostropheI18nOptions } = self.apos.modules['apostrophe-i18n'].options;
       const i18nOptions = {
         ...apostropheI18nOptions,
+        indent: '  ',
         autoReload: options.autoReload,
         defaultLocale: options.defaultLocale,
         objectNotation: options.objectNotation,
