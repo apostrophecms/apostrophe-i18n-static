@@ -75,7 +75,8 @@ module.exports = {
     options.addFilters = [
       {
         name: 'lang',
-        label: 'Language'
+        label: 'Language',
+        displayCurrentLocale: options.useWorkflowLocales && options.useWorkflowLocales.displayCurrentLocale
       },
       ...(options.addFilters || [])
     ];
@@ -87,7 +88,7 @@ module.exports = {
     self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
 
     // need to populate "lang.choices" field with this function when apostrophe-workflow is used with "useWorkflowLocales" option
-    self.getLocales = () => options.locales.sort(function (a, b) { return a.label.localeCompare(b.label); });
+    self.getLocales = () => options.locales.sort((a, b) => a.label.localeCompare(b.label));
 
     const superPageBeforeSend = self.pageBeforeSend;
     self.pageBeforeSend = (req) => {
