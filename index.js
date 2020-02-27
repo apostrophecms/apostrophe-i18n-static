@@ -18,7 +18,8 @@ module.exports = {
         label: 'Language',
         type: 'select',
         choices: 'getLocales',
-        required: true
+        required: true,
+        disabled: options.disableLocaleChange
       },
       {
         name: 'key',
@@ -76,7 +77,7 @@ module.exports = {
       {
         name: 'lang',
         label: 'Language',
-        displayCurrentLocale: options.useWorkflowLocales && options.useWorkflowLocales.displayCurrentLocale
+        disableLocaleChange: options.disableLocaleChange
       },
       ...(options.addFilters || [])
     ];
@@ -213,7 +214,8 @@ module.exports = {
         disabledKey: false,
         objectNotation: false,
         generateAtStartup: true,
-        useWorkflowLocales: false
+        useWorkflowLocales: false,
+        disableLocaleChange: false
       };
       options = Object.assign({}, defaults, options);
 

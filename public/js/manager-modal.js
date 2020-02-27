@@ -14,11 +14,11 @@ apos.define('apostrophe-i18n-static-manager-modal', {
     var superRefresh = self.refresh;
     self.refresh = function(callback) {
       _.forEach(options.filters, function(filter) {
-        if (filter.name === 'lang' && filter.displayCurrentLocale) {
+        if (filter.name === 'lang' && filter.disableLocaleChange) {
           setTimeout(function() {
             var $select = self.$filters.find('select[name="lang"]');
             $select.prop('disabled', true);
-          }, 200);
+          }, 500);
         }
       });
       return superRefresh(callback);

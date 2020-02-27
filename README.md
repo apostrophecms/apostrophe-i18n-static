@@ -82,8 +82,9 @@ Other options are:
 - `disabledKey`: default `false`. When `true`, it will render the `key` field as "disabled" to inform users the key should not be modified.
 - `autoReload`: default `true`. When `false`, it will not reload JSON files when a translation piece is edited.
 - `generateAtStartup`: default `true`. When `false`, JSON files are not generated automatically at startup.
-- `useWorkflowLocales`: default `false`. If `true`, it uses `apostrophe-workflow` `locales` array (must have installed and configured `apostrophe-workflow` before - see 4. [Usage with apostrophe-workflow](#4)). In this case, the `locales` array from `apostrophe-i18n-static` module is not used. This option might be an object, containing a sub-option: `displayCurrentLocale: true`. This locks the locale displayed in the "list" modal of apostrophe-i18n-static. For example, if one is on `es-ES` locale, they would only see spanish translations, and would not be able to edit another locale's translation (unless changing locale in apostrophe-workflow).
-![displayCurrentLocale](apostrophe-i18n-pieces-list-current-locale.png)
+- `useWorkflowLocales`: default `false`. If `true`, it uses `apostrophe-workflow` `locales` array (must have installed and configured `apostrophe-workflow` before - see 4. [Usage with apostrophe-workflow](#4)). In this case, the `locales` array from `apostrophe-i18n-static` module is not used.
+- `disableLocaleChange`: default `false`. If `true`, this locks the locale displayed in the "list" modal of apostrophe-i18n-static and in the "edit" piece modal. For example, if one is on `es-ES` locale, they would only see spanish translations, and would not be able to edit another locale's translation (unless changing locale in apostrophe-workflow if used).
+![disableLocaleChange](apostrophe-i18n-pieces-list-current-locale.png)
 - `objectNotation`: default `false`. As in `i18n`, when `true`, the separator will be `.`. Otherwise, it will take `objectNotation` value. For example, `objectNotation: '-'` will convert `obj-with-deep-val` into
 
 ```js

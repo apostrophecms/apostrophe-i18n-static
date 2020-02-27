@@ -6,9 +6,10 @@ apos.define('apostrophe-i18n-static-editor-modal', {
       options.schema.forEach(function(field) {
         if (field.disabled) {
           // disable visually a field marked as "disabled" in the schema to block modifications
-          // done for the "key" field mostly
-          var $name = apos.schemas.findField(self.$el, field.name);
-          $name.attr('disabled', true);
+          setTimeout(function() {
+            var $name = apos.schemas.findField(self.$el, field.name);
+            $name.prop('disabled', true);
+          }, 500);
         }
       });
       return superBeforeShow(callback);
