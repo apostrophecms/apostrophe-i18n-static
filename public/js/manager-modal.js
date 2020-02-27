@@ -18,7 +18,7 @@ apos.define('apostrophe-i18n-static-manager-modal', {
           setTimeout(function() {
             var $select = self.$filters.find('select[name="lang"]');
             $select.prop('disabled', true);
-          }, 100);
+          }, 200);
         }
       });
       return superRefresh(callback);

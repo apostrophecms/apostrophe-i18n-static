@@ -82,7 +82,8 @@ Other options are:
 - `disabledKey`: default `false`. When `true`, it will render the `key` field as "disabled" to inform users the key should not be modified.
 - `autoReload`: default `true`. When `false`, it will not reload JSON files when a translation piece is edited.
 - `generateAtStartup`: default `true`. When `false`, JSON files are not generated automatically at startup.
-- `useWorkflowLocales`: default `false`. If `true`, it uses `apostrophe-workflow` `locales` array (must have installed and configured `apostrophe-workflow` before - see 4. [Usage with apostrophe-workflow](#4)). In this case, the `locales` array from `apostrophe-i18n-static` module is not used.
+- `useWorkflowLocales`: default `false`. If `true`, it uses `apostrophe-workflow` `locales` array (must have installed and configured `apostrophe-workflow` before - see 4. [Usage with apostrophe-workflow](#4)). In this case, the `locales` array from `apostrophe-i18n-static` module is not used. This option might be an object, containing a sub-option: `displayCurrentLocale: true`. This locks the locale displayed in the "list" modal of apostrophe-i18n-static. For example, if one is on `es-ES` locale, they would only see spanish translations, and would not be able to edit another locale's translation (unless changing locale in apostrophe-workflow).
+![displayCurrentLocale](apostrophe-i18n-pieces-list-current-locale.png)
 - `objectNotation`: default `false`. As in `i18n`, when `true`, the separator will be `.`. Otherwise, it will take `objectNotation` value. For example, `objectNotation: '-'` will convert `obj-with-deep-val` into
 
 ```js
@@ -108,6 +109,8 @@ obj: {
   }
 }
 ```
+
+Be aware i18n catches every `__("")` key from Apostrophe templates, even the ones from Apostrophe core interface, that is to say every wording in modals, buttons, labels... And dots are used often (e.g: "Search pieces..." in Apostrophe search bar). These dots will be interpreted as separator if `objectNotation` default is activated. Therefore, it is recommended to choose another separator. For example, `objectNotation: '-'` or `objectNotation: '*'` to avoid confusion.
 
 Options from `apostrophe-i18n` module are taken into account, except `locales` and `defaultLocale`.
 
