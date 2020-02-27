@@ -17,6 +17,10 @@
     "apostrophecms",
     "apostrophe"
   ],
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/apostrophecms/apostrophe-i18n-static.git"
+  },
   "dependencies": {
     "fs-extra": "^8.1.0"
   },
