@@ -11,17 +11,15 @@ apos.define('apostrophe-i18n-static-manager-modal', {
       return superGenerateFilter(filter);
     };
 
-    var superRefresh = self.refresh;
-    self.refresh = function(callback) {
+    var superAfterRefresh = self.afterRefresh;
+    self.afterRefresh = function(callback) {
       _.forEach(options.filters, function(filter) {
         if (filter.name === 'lang' && filter.disableLocaleChange) {
-          setTimeout(function() {
-            var $select = self.$filters.find('select[name="lang"]');
-            $select.prop('disabled', true);
-          }, 500);
+          var $select = self.$filters.find('select[name="lang"]');
+          $select.prop('disabled', true);
         }
       });
-      return superRefresh(callback);
+      return superAfterRefresh(callback);
     };
   }
 });
