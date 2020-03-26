@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-i18n-static",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Translation editable pieces with I18n",
   "main": "index.js",
   "author": "@apostrophecms",
@@ -18,8 +18,8 @@
     "apostrophe"
   ],
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/apostrophecms/apostrophe-i18n-static.git"
+    "type": "git",
+    "url": "https://github.com/apostrophecms/apostrophe-i18n-static.git"
   },
   "dependencies": {
     "fs-extra": "^8.1.0"
