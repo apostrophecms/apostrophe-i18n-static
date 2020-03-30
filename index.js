@@ -6,6 +6,7 @@ module.exports = {
   name: 'apostrophe-i18n-static',
   label: 'I18n static piece',
   pluralLabel: 'I18n static pieces',
+  seo: false,
   moogBundle: {
     modules: ['apostrophe-i18n-templates'],
     directory: 'lib/modules'
