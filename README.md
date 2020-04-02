@@ -6,12 +6,11 @@
 2. [Configuration](#2)<br>
 3. [Usage in production](#3)<br>
 4. [Usage with apostrophe-workflow](#4)<br>
+5. [Ignoring phrases that come from Apostrophe's admin UI](#5)<br>
 
 This module adds editable pieces for translation through i18n to an Apostrophe project.
 
-:warning: **Warning!!!** :warning:
-
-It is intendend to localize static text in templates i.e text wrapped with `__("...")`, not localize editable content. If your goal is content localization, you should use the [Apostrophe workflow module](https://github.com/apostrophecms/apostrophe-workflow) instead.
+> This module is intendend to localize static text in templates i.e text wrapped with `__("...")`, **not localize editable content.** If your goal is content localization, you should use the [Apostrophe workflow module](https://github.com/apostrophecms/apostrophe-workflow) instead.
 
 I18n static pieces are excluded from apostrophe-workflow. To use both `apostrophe-i18n-static` and `apostrophe-workflow`, see [Usage with apostrophe-workflow](#4)
 
@@ -327,3 +326,46 @@ const apos = require('apostrophe')({
   }
 });
 ```
+
+### 5 Ignoring phrases that come from Apostrophe's admin UI
+
+For some projects, you may not be interested in translating the phrases that make up Apostrophe's admin UI.
+
+The first step is to tell ApostropheCMS to "namespace" those phrases:
+
+```js
+modules: {
+  'apostrophe-i18n': {
+    namespaces: true
+  }
+}
+```
+
+When you do so, you will notice that phrases from the admin interface now appear in the translation interface with a prefix. Here is an example:
+
+```
+apostrophe<:>Groups
+```
+
+The default translations have that prefix too, so they can be recognized as defaults, but it should be removed if you do decide to translate them.
+
+The next step is to instruct `apostrophe-i18n-static` to hide these phrases from the translation interface, so that the defaults are not changed by your translation team:
+
+```js
+modules: {
+  'apostrophe-i18n-static': {
+    ignoreNamespaces: [ 'apostrophe' ]
+  }
+}
+```
+
+Note that you may namespace your own translations using the namespaced versions of the various i18n helpers:
+
+```
+__ns('phrase')
+__ns_n('phrase', amount)
+```
+
+Etc. These namespaced helpers do not necessarily support 100% of the feature set of the standard i18n helpers.
+
+A future release of this module will likely support working with namespaces in a more nuanced way, such as filtering by namespace and not displaying the namespace as part of the key. But for the time being, the ability to ignore the `apostrophe` namespace has been the most popular request, so we have provided that first.
