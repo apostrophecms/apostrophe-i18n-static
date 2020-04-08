@@ -4,9 +4,11 @@ const { inspect } = require('util');
 module.exports = {
   extend: 'apostrophe-pieces',
   name: 'apostrophe-i18n-static',
-  label: 'I18n static piece',
-  pluralLabel: 'I18n static pieces',
+  label: 'Phrase',
+  pluralLabel: 'Phrases',
   seo: false,
+  personas: false,
+  sitemap: false,
   moogBundle: {
     modules: ['apostrophe-i18n-templates'],
     directory: 'lib/modules'
