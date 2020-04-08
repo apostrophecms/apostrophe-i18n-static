@@ -7,6 +7,8 @@ module.exports = {
   label: 'Phrase',
   pluralLabel: 'Phrases',
   seo: false,
+  personas: false,
+  sitemap: false,
   moogBundle: {
     modules: ['apostrophe-i18n-templates'],
     directory: 'lib/modules'
