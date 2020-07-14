@@ -142,8 +142,10 @@ module.exports = {
     async function saveI18nFile(argv) {
       if (argv.locale) {
         try {
-          console.time(`${argv.locale} done in`);
-          console.log('Generating i18n file for', inspect(argv.locale, { colors: true }));
+          if (argv.verbose) {
+            console.time(`${argv.locale} done in`);
+            console.log('Generating i18n file for', inspect(argv.locale, { colors: true }));
+          }
 
           let translations = await i18nCache.get(argv.locale) || {};
           const localesDir = self.apos.modules['apostrophe-i18n'].options.directory;
@@ -168,7 +170,10 @@ module.exports = {
             `apostrophe-i18n:${argv.locale}`,
             async () => fs.writeJson(file, translations, { spaces: 2 })
           );
-          console.timeEnd(`${argv.locale} done in`);
+
+          if (argv.verbose) {
+            console.timeEnd(`${argv.locale} done in`);
+          }
         } catch (error) {
           if (!error.message.match(/lock apostrophe-i18n:/)) {
             console.error(error.message);
@@ -245,11 +250,15 @@ module.exports = {
 
     self.on('apostrophe:modulesReady', 'generateJSONs', async function() {
       if (options.generateAtStartup) {
-        console.time('Total time');
-        for (const lang of options.locales) {
-          await saveI18nFile({ locale: lang.value });
+        if (options.verbose) {
+          console.time('Total time');
         }
-        console.timeEnd('Total time');
+        for (const lang of options.locales) {
+          await saveI18nFile({ locale: lang.value, verbose: options.verbose });
+        }
+        if (options.verbose) {
+          console.timeEnd('Total time');
+        }
       }
     });
 
@@ -271,7 +280,7 @@ module.exports = {
     self.addTask('reload-all', 'Reload all i18n files', async () => {
       console.time('Total time');
       for (const lang of options.locales) {
-        await saveI18nFile({ locale: lang.value });
+        await saveI18nFile({ locale: lang.value, verbose: true });
       }
       console.timeEnd('Total time');
     });
