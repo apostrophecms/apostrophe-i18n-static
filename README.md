@@ -112,6 +112,27 @@ obj: {
 
 Be aware i18n catches every `__("")` key from Apostrophe templates, even the ones from Apostrophe core interface, that is to say every wording in modals, buttons, labels... And dots are used often (e.g: "Search pieces..." in Apostrophe search bar). These dots will be interpreted as separator if `objectNotation` default is activated. Therefore, it is recommended to choose another separator. For example, `objectNotation: '-'` or `objectNotation: '*'` to avoid confusion.
 
+- `verbose`: default `false`. When `true`, it will output messages when adding a new wording or generating a JSON file.
+Example of output:
+
+```js
+  Generating i18n file for 'master'
+  master done in: 10.102ms
+  Generating i18n file for 'en-US'
+  en-US done in: 3.846ms
+  Generating i18n file for 'es-ES'
+  es-ES done in: 5.492ms
+  Generating i18n file for 'fr-FR'
+  fr-FR done in: 3.887ms
+  Generating i18n file for 'de-DE'
+  de-DE done in: 3.441ms
+  Generating i18n file for 'de-AT'
+  de-AT done in: 16.639ms
+  Generating i18n file for 'de-CH'
+  de-CH done in: 8.960ms
+  Total time: 53.139ms
+```
+
 Options from `apostrophe-i18n` module are taken into account, except `locales` and `defaultLocale`.
 
 #### JSON files regeneration
