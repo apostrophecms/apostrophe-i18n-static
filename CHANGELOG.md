@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.1.1 - 09-30-2020
+## 1.1.1 - 10-07-2020
 
 Fixed possible duplication bug if `objectNotation` is true.
 
