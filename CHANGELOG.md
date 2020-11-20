@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.2 - 11-25-2020
+
+Fixed "verbose" option while generating a file.
+
 ## 1.1.1 - 10-07-2020
 
 Fixed possible duplication bug if `objectNotation` is true.
