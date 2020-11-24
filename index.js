@@ -133,7 +133,7 @@ module.exports = {
       // so need to reload this i18n language file
       if (options.autoReload && self.lastI18nGeneration !== req.data.global.i18nGeneration) {
         const locale = self.getLocale(req);
-        await saveI18nFile({ locale });
+        await saveI18nFile({ locale, ...options });
       }
       self.lastI18nGeneration = req.data.global.i18nGeneration;
       next();
