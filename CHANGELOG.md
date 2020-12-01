@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.1.2 - 11-25-2020
+## 1.1.2 - 12-02-2020
 
 Fixed "verbose" option while generating a file.
 
