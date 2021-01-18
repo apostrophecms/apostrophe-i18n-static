@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-i18n-static",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Translation editable pieces with I18n",
   "main": "index.js",
   "author": "@apostrophecms",
