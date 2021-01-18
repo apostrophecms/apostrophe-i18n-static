@@ -112,13 +112,19 @@ module.exports = {
       try {
         // update global doc with random number to compare it with the next req
         // see expressMiddleware in this file
-        const i18nGeneration = self.apos.utils.generateId();
+        const localeI18nGeneration = self.apos.utils.generateId();
         const query = { type: 'apostrophe-global' };
 
         if (self.apos.modules['apostrophe-workflow']) {
           query.workflowLocale = { $in: [piece.lang, piece.lang + '-draft'] };
         }
-        await self.apos.docs.db.update(query, { $set: { i18nGeneration } }, { multi: true });
+        await self.apos.docs.db.updateMany(query, {
+          $set: {
+            i18nGeneration: {
+              [piece.lang]: localeI18nGeneration
+            }
+          }
+        });
         await i18nCache.set(piece.lang, {});
 
         return callback();
@@ -131,11 +137,12 @@ module.exports = {
       // compare i18n number in req and in global
       // if they don't match, it means a language had a translation piece edited
       // so need to reload this i18n language file
-      if (options.autoReload && self.lastI18nGeneration !== req.data.global.i18nGeneration) {
-        const locale = self.getLocale(req);
+      const locale = self.getLocale(req);
+      self.lastI18nGeneration = self.lastI18nGeneration || {};
+      if (options.autoReload && self.lastI18nGeneration[locale] !== req.data.global.i18nGeneration[locale]) {
         await saveI18nFile({ locale });
       }
-      self.lastI18nGeneration = req.data.global.i18nGeneration;
+      self.lastI18nGeneration[locale] = req.data.global.i18nGeneration[locale];
       next();
     };
 
