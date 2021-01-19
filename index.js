@@ -112,19 +112,13 @@ module.exports = {
       try {
         // update global doc with random number to compare it with the next req
         // see expressMiddleware in this file
-        const localeI18nGeneration = self.apos.utils.generateId();
+        const i18nGeneration = self.apos.utils.generateId();
         const query = { type: 'apostrophe-global' };
 
         if (self.apos.modules['apostrophe-workflow']) {
           query.workflowLocale = { $in: [piece.lang, piece.lang + '-draft'] };
         }
-        await self.apos.docs.db.updateMany(query, {
-          $set: {
-            i18nGeneration: {
-              [piece.lang]: localeI18nGeneration
-            }
-          }
-        });
+        await self.apos.docs.db.updateMany(query, { $set: { i18nGeneration } });
         await i18nCache.set(piece.lang, {});
 
         return callback();
