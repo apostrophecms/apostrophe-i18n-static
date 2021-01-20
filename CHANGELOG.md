@@ -1,8 +1,8 @@
 # CHANGELOG
 
-## 1.2.0 - 01-20-2021
+## 1.1.3 - 01-20-2021
 
-Added one unique identifier per locale when saving translations, in order to work with apostrophe-workflow and reload only when necessary
+Fixed one unique identifier per locale when saving translations, in order to work with apostrophe-workflow and reload only when necessary.
 
 ## 1.1.2 - 12-02-2020
 
