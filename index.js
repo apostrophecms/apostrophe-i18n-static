@@ -272,6 +272,10 @@ module.exports = {
     });
     /* apostrophe-workflow exclusion end */
 
+    self.on('apostrophe:migrate', 'createIndex', function () {
+      return self.apos.docs.db.createIndex({ key: 1, lang: 1 }, { unique: true, partialFilterExpression: { type: self.name } });
+    });
+
     self.addTask(
       'reload',
       'Reload i18n file, usage "node app apostrophe-i18n-static:reload --locale=xx-XX"',
@@ -285,11 +289,5 @@ module.exports = {
       }
       console.timeEnd('Total time');
     });
-  },
-
-  async afterConstruct(self) {
-    await self.apos.docs.db
-      .createIndex({ key: 1, lang: 1 }, { unique: true, partialFilterExpression: { type: self.name } })
-      .catch(error => console.error(error.message));
   }
 };
