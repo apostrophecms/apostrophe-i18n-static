@@ -108,6 +108,10 @@ module.exports = {
     };
 
     self.afterSave = async (req, piece, options, callback) => {
+      return self.updateGeneration(req, piece, callback);
+    };
+
+    self.updateGeneration = async function(req, piece, callback) {
       try {
         // update global doc with random number to compare it with the next req
         // see expressMiddleware in this file
@@ -115,12 +119,18 @@ module.exports = {
         const query = { type: 'apostrophe-global' };
 
         if (self.apos.modules['apostrophe-workflow']) {
-          query.workflowLocale = { $in: [piece.lang, piece.lang + '-draft'] };
+          query.workflowLocale = {
+            $in: [
+              piece.lang, piece.lang + '-draft'
+            ]
+          };
         }
         await self.apos.docs.db.updateMany(query, { $set: { i18nGeneration } });
         await self.db.update({
           _id: piece.lang
-        }, {}, { upsert: true });
+        }, {
+          translations: {}
+        }, { upsert: true });
         return callback();
       } catch (error) {
         return callback(error);
@@ -149,7 +159,8 @@ module.exports = {
             console.log('Generating i18n file for', inspect(argv.locale, { colors: true }));
           }
 
-          let translations = (await self.db.findOne({ _id: argv.locale })) || {};
+          const record = await self.db.findOne({ _id: argv.locale });
+          let translations = (record && record.translations) || {};
           const localesDir = self.apos.modules['apostrophe-i18n'].options.directory;
           const file = localesDir + '/' + argv.locale + '.json';
           await fs.ensureFile(file);
@@ -162,7 +173,7 @@ module.exports = {
             translations = translatePieces(pieces);
 
             if (Object.entries(translations).length) { // avoid duplicate key error if empty
-              await self.db.update({ _id: argv.locale }, translations, { upsert: true });
+              await self.db.update({ _id: argv.locale }, { translations }, { upsert: true });
             }
           }
 
@@ -249,6 +260,15 @@ module.exports = {
       self.apos.i18n.configure(i18nOptions);
     });
 
+    // Before we generate the JSONs, we need to exclude the type from workflow,
+    // or the queries will fail
+    self.on('apostrophe:modulesReady', 'excludeType', () => {
+      const workflow = self.apos.modules['apostrophe-workflow'];
+      if (workflow) {
+        workflow.excludeTypes.push(self.name);
+      }
+    });
+
     self.on('apostrophe:modulesReady', 'generateJSONs', async function() {
       if (options.generateAtStartup) {
         if (options.verbose) {
@@ -262,15 +282,6 @@ module.exports = {
         }
       }
     });
-
-    /* apostrophe-workflow exclusion start */
-    self.on('apostrophe:modulesReady', 'excludeType', () => {
-      const workflow = self.apos.modules['apostrophe-workflow'];
-      if (workflow) {
-        workflow.excludeTypes.push(self.name);
-      }
-    });
-    /* apostrophe-workflow exclusion end */
 
     self.on('apostrophe:migrate', 'createIndex', function () {
       return self.apos.docs.db.createIndex({ key: 1, lang: 1 }, { unique: true, partialFilterExpression: { type: self.name } });
