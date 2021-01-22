@@ -118,7 +118,7 @@ module.exports = {
         if (self.apos.modules['apostrophe-workflow']) {
           query.workflowLocale = { $in: [piece.lang, piece.lang + '-draft'] };
         }
-        await self.apos.docs.db.update(query, { $set: { i18nGeneration } }, { multi: true });
+        await self.apos.docs.db.updateMany(query, { $set: { i18nGeneration } });
         await i18nCache.set(piece.lang, {});
 
         return callback();
@@ -131,11 +131,13 @@ module.exports = {
       // compare i18n number in req and in global
       // if they don't match, it means a language had a translation piece edited
       // so need to reload this i18n language file
-      if (options.autoReload && self.lastI18nGeneration !== req.data.global.i18nGeneration) {
-        const locale = self.getLocale(req);
+      const locale = self.getLocale(req);
+      self.lastI18nGeneration = self.lastI18nGeneration || {};
+      req.data.global.i18nGeneration = (typeof req.data.global.i18nGeneration === 'string') ? req.data.global.i18nGeneration : '';
+      if (options.autoReload && self.lastI18nGeneration[locale] !== req.data.global.i18nGeneration) {
         await saveI18nFile({ locale, ...options });
       }
-      self.lastI18nGeneration = req.data.global.i18nGeneration;
+      self.lastI18nGeneration[locale] = req.data.global.i18nGeneration;
       next();
     };
 
@@ -271,6 +273,10 @@ module.exports = {
     });
     /* apostrophe-workflow exclusion end */
 
+    self.on('apostrophe:migrate', 'createIndex', function () {
+      return self.apos.docs.db.createIndex({ key: 1, lang: 1 }, { unique: true, partialFilterExpression: { type: self.name } });
+    });
+
     self.addTask(
       'reload',
       'Reload i18n file, usage "node app apostrophe-i18n-static:reload --locale=xx-XX"',
@@ -284,11 +290,5 @@ module.exports = {
       }
       console.timeEnd('Total time');
     });
-  },
-
-  async afterConstruct(self) {
-    await self.apos.docs.db
-      .createIndex({ key: 1, lang: 1 }, { unique: true, partialFilterExpression: { type: self.name } })
-      .catch(error => console.error(error.message));
   }
 };

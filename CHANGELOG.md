@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.3 - 01-27-2021
+
+Fixed one unique identifier per locale when saving translations, in order to work with apostrophe-workflow and reload only when necessary.
+
 ## 1.1.2 - 12-02-2020
 
 Fixed "verbose" option while generating a file.
