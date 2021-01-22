@@ -133,10 +133,11 @@ module.exports = {
       // so need to reload this i18n language file
       const locale = self.getLocale(req);
       self.lastI18nGeneration = self.lastI18nGeneration || {};
-      if (options.autoReload && self.lastI18nGeneration[locale] !== req.data.global.i18nGeneration[locale]) {
+      req.data.global.i18nGeneration = (typeof req.data.global.i18nGeneration === 'string') ? req.data.global.i18nGeneration : '';
+      if (options.autoReload && self.lastI18nGeneration[locale] !== req.data.global.i18nGeneration) {
         await saveI18nFile({ locale, ...options });
       }
-      self.lastI18nGeneration[locale] = req.data.global.i18nGeneration[locale];
+      self.lastI18nGeneration[locale] = req.data.global.i18nGeneration;
       next();
     };
 
