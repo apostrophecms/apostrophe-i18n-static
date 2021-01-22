@@ -1,8 +1,13 @@
 # CHANGELOG
 
+
 ## 1.1.3 - 01-27-2021
 
-Fixed one unique identifier per locale when saving translations, in order to work with apostrophe-workflow and reload only when necessary.
+* Collection used rather than cache to avoid issues when the database is shared between environments but the cache is not.
+
+* One unique identifier per locale when saving translations, in order to work with apostrophe-workflow and reload only when necessary.
+
+* Leaves database schema alone when starting up with migrations disabled.
 
 ## 1.1.2 - 12-02-2020
 
