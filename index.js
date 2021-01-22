@@ -86,8 +86,7 @@ module.exports = {
     ];
   },
 
-  async construct(self, options) {
-    const i18nCache = self.apos.caches.get('i18n-static');
+  construct(self, options) {
 
     self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
 
@@ -119,8 +118,9 @@ module.exports = {
           query.workflowLocale = { $in: [piece.lang, piece.lang + '-draft'] };
         }
         await self.apos.docs.db.updateMany(query, { $set: { i18nGeneration } });
-        await i18nCache.set(piece.lang, {});
-
+        await self.db.update({
+          _id: piece.lang
+        }, {}, { upsert: true });
         return callback();
       } catch (error) {
         return callback(error);
@@ -149,12 +149,11 @@ module.exports = {
             console.log('Generating i18n file for', inspect(argv.locale, { colors: true }));
           }
 
-          let translations = await i18nCache.get(argv.locale) || {};
+          let translations = (await self.db.findOne({ _id: argv.locale })) || {};
           const localesDir = self.apos.modules['apostrophe-i18n'].options.directory;
           const file = localesDir + '/' + argv.locale + '.json';
           await fs.ensureFile(file);
 
-          // create cache
           if (Object.entries(translations).length === 0) {
             const req = self.apos.tasks.getAnonReq();
             const pieces = await self
@@ -163,7 +162,7 @@ module.exports = {
             translations = translatePieces(pieces);
 
             if (Object.entries(translations).length) { // avoid duplicate key error if empty
-              await i18nCache.set(argv.locale, translations);
+              await self.db.update({ _id: argv.locale }, translations, { upsert: true });
             }
           }
 
@@ -290,5 +289,17 @@ module.exports = {
       }
       console.timeEnd('Total time');
     });
+
+    self.enableCollection = function(callback) {
+      return self.apos.db.collection('aposI18nStaticTranslations', function(err, collection) {
+        self.db = collection;
+        return callback(err);
+      });
+    };
+
+  },
+
+  async afterConstruct(self, callback) {
+    return self.enableCollection(callback);
   }
 };
