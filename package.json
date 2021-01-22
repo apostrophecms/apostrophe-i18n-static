@@ -40,6 +40,7 @@
     "nyc": "^14.1.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
-    "server-destroy": "^1.0.1"
+    "server-destroy": "^1.0.1",
+    "why-is-node-running": "^2.2.0"
   }
 }
