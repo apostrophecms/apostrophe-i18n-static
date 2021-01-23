@@ -13,6 +13,8 @@ describe('Apostrophe-i18n-static', function() {
       }).catch(function(e) {
         /* eslint-disable no-unused-expressions */
         expect(e).to.be.null;
+        // Quiet node's warning about an ignored rejection
+        return null;
       });
     });
   });
