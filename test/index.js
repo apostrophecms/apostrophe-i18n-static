@@ -32,7 +32,7 @@ describe('Apostrophe-i18n-static', function() {
             session: {
               secret: 'test123'
             },
-            port: 3000
+            port: 9999
           },
           'apostrophe-i18n-static': {
             disabledKey: true,
