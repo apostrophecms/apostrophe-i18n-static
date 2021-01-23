@@ -33,7 +33,7 @@ describe('Apostrophe-i18n-static', function() {
             session: {
               secret: 'test123'
             },
-            port: 3000
+            port: 9999
           },
           'apostrophe-i18n-static': {
             autoReload: false,
@@ -75,7 +75,7 @@ describe('Apostrophe-i18n-static', function() {
 
       // even after visiting a template, JSON is not generated due to "autoReload: false" option in apos
       // see configuration in appWithoutAutoReload.js
-      await rp('http://localhost:3000');
+      await rp('http://localhost:9999');
       const file = JSON.parse(await asyncReadFile('./test/locales/en-US.json', { encoding: 'utf8' }));
       expect(file).to.have.property('test2', 'test');
     });

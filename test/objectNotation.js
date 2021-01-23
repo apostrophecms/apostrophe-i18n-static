@@ -32,7 +32,7 @@ describe('Apostrophe-i18n-static', function() {
           session: {
             secret: 'test123'
           },
-          port: 3000
+          port: 9999
         },
         'apostrophe-i18n-static': {
           objectNotation: true,
@@ -62,7 +62,7 @@ describe('Apostrophe-i18n-static', function() {
     it('should convert object notation string to nested object in JSON file', async function () {
       const asyncReadFile = promisify(fs.readFile);
 
-      await rp('http://localhost:3000/object');
+      await rp('http://localhost:9999/object');
       const file = JSON.parse(await asyncReadFile('./test/locales/en-US.json', { encoding: 'utf8' }));
       expect(file).to.have.deep.property('deep', { nested: { val: 'nested value' } });
     });
