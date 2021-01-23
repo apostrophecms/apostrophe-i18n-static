@@ -6,17 +6,12 @@ let apos;
 let req;
 
 describe('Apostrophe-i18n-static', function() {
-  after(function(done) {
-    fs.remove('./test/locales').then(() => {
-      fs.remove('./test/data').then(() => {
-        require('apostrophe/test-lib/util').destroy(apos, done);
-      }).catch(function(e) {
-        /* eslint-disable no-unused-expressions */
-        expect(e).to.be.null;
-        // Quiet node's warning about an ignored rejection
-        return null;
-      });
-    });
+
+  after(async () => {
+    const destroy = require('util').promisify(require('apostrophe/test-lib/util').destroy);
+    await destroy(apos);
+    await fs.remove('./test/locales');
+    await fs.remove('./test/data');
   });
 
   describe('#pieces', function() {
@@ -50,6 +45,7 @@ describe('Apostrophe-i18n-static', function() {
           }
         },
         afterListen: function(err) {
+          /* eslint-disable-next-line no-unused-expressions */
           expect(err).to.be.null;
           req = apos.tasks.getReq();
           done();

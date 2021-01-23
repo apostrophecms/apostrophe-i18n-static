@@ -10,7 +10,7 @@ module.exports = {
   personas: false,
   sitemap: false,
   moogBundle: {
-    modules: ['apostrophe-i18n-templates'],
+    modules: [ 'apostrophe-i18n-templates' ],
     directory: 'lib/modules'
   },
 
@@ -45,13 +45,13 @@ module.exports = {
       ...(options.addFields || [])
     ];
 
-    options.removeFields = ['slug', 'tags', 'published', 'title', ...(options.removeFields || [])];
+    options.removeFields = [ 'slug', 'tags', 'published', 'title', ...(options.removeFields || []) ];
 
     options.arrangeFields = [
       {
         name: 'basics',
         label: 'Basics',
-        fields: ['lang', 'key', 'title', 'valueSingular', 'valuePlural', 'trash']
+        fields: [ 'lang', 'key', 'title', 'valueSingular', 'valuePlural', 'trash' ]
       },
       ...(options.arrangeFields || [])
     ];
@@ -145,7 +145,10 @@ module.exports = {
       self.lastI18nGeneration = self.lastI18nGeneration || {};
       req.data.global.i18nGeneration = (typeof req.data.global.i18nGeneration === 'string') ? req.data.global.i18nGeneration : '';
       if (options.autoReload && self.lastI18nGeneration[locale] !== req.data.global.i18nGeneration) {
-        await saveI18nFile({ locale, ...options });
+        await saveI18nFile({
+          locale,
+          ...options
+        });
       }
       self.lastI18nGeneration[locale] = req.data.global.i18nGeneration;
       next();
@@ -168,7 +171,14 @@ module.exports = {
           if (Object.entries(translations).length === 0) {
             const req = self.apos.tasks.getAnonReq();
             const pieces = await self
-              .find(req, { published: true, lang: argv.locale }, { key: 1, valueSingular: 1, valuePlural: 1 })
+              .find(req, {
+                published: true,
+                lang: argv.locale
+              }, {
+                key: 1,
+                valueSingular: 1,
+                valuePlural: 1
+              })
               .toArray();
             translations = translatePieces(pieces);
 
@@ -204,10 +214,13 @@ module.exports = {
       };
 
       return pieces.reduce((acc, cur) => {
-        const keys = options.objectNotation ? cur.key.split(options.objectNotation) : [cur.key];
+        const keys = options.objectNotation ? cur.key.split(options.objectNotation) : [ cur.key ];
 
         if (cur.valuePlural) {
-          return nest(acc, keys, { one: cur.valueSingular, other: cur.valuePlural });
+          return nest(acc, keys, {
+            one: cur.valueSingular,
+            other: cur.valuePlural
+          });
         } else {
           return nest(acc, keys, cur.valueSingular);
         }
@@ -275,7 +288,10 @@ module.exports = {
           console.time('Total time');
         }
         for (const lang of options.locales) {
-          await saveI18nFile({ locale: lang.value, verbose: options.verbose });
+          await saveI18nFile({
+            locale: lang.value,
+            verbose: options.verbose
+          });
         }
         if (options.verbose) {
           console.timeEnd('Total time');
@@ -284,7 +300,13 @@ module.exports = {
     });
 
     self.on('apostrophe:migrate', 'createIndex', function () {
-      return self.apos.docs.db.createIndex({ key: 1, lang: 1 }, { unique: true, partialFilterExpression: { type: self.name } });
+      return self.apos.docs.db.createIndex({
+        key: 1,
+        lang: 1
+      }, {
+        unique: true,
+        partialFilterExpression: { type: self.name }
+      });
     });
 
     self.addTask(
@@ -296,7 +318,10 @@ module.exports = {
     self.addTask('reload-all', 'Reload all i18n files', async () => {
       console.time('Total time');
       for (const lang of options.locales) {
-        await saveI18nFile({ locale: lang.value, verbose: true });
+        await saveI18nFile({
+          locale: lang.value,
+          verbose: true
+        });
       }
       console.timeEnd('Total time');
     });
