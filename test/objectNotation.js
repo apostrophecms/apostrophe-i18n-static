@@ -1,5 +1,4 @@
-const fs = require('fs');
-const del = require('del');
+const fs = require('fs-extra');
 const { expect } = require('chai');
 const rp = require('request-promise');
 const { promisify } = require('util');
@@ -9,11 +8,13 @@ let apos;
 describe('Apostrophe-i18n-static', function() {
 
   after(function(done) {
-    del(['./test/locales', './test/data']).then(function() {
-      require('apostrophe/test-lib/util').destroy(apos, done);
-    }).catch(function(e) {
-      /* eslint-disable no-unused-expressions */
-      expect(e).to.be.null;
+    fs.remove('./test/locales').then(() => {
+      fs.remove('./test/data').then(() => {
+        require('apostrophe/test-lib/util').destroy(apos, done);
+      }).catch(function(e) {
+        /* eslint-disable no-unused-expressions */
+        expect(e).to.be.null;
+      });
     });
   });
 
