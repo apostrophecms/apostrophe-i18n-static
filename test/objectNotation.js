@@ -10,7 +10,6 @@ describe('Apostrophe-i18n-static', function() {
   after(async () => {
     const destroy = require('util').promisify(require('apostrophe/test-lib/util').destroy);
     await destroy(apos);
-    await sleep(1000);
     fs.removeSync('./test/locales');
     fs.removeSync('./test/data');
   });
