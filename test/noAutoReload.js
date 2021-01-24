@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const { expect } = require('chai');
 const rp = require('request-promise');
 const { promisify } = require('util');
+const sleep = require('./lib/sleep');
 
 let apos;
 let req;
@@ -11,6 +12,7 @@ describe('Apostrophe-i18n-static', function() {
   after(async () => {
     const destroy = require('util').promisify(require('apostrophe/test-lib/util').destroy);
     await destroy(apos);
+    await sleep(1000);
     await fs.remove('./test/locales');
     await fs.remove('./test/data');
   });

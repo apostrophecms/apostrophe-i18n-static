@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const { expect } = require('chai');
 const { promisify } = require('util');
+const sleep = require('./lib/sleep');
 
 let apos;
 let req;
@@ -10,6 +11,7 @@ describe('Apostrophe-i18n-static', function() {
   after(async () => {
     const destroy = require('util').promisify(require('apostrophe/test-lib/util').destroy);
     await destroy(apos);
+    await sleep(1000);
     await fs.remove('./test/locales');
     await fs.remove('./test/data');
   });
@@ -102,7 +104,9 @@ describe('Apostrophe-i18n-static', function() {
           valueSingular: 'test'
         });
       } catch (error) {
-        expect(error).to.match(/E11000 duplicate key error collection: i18n-test.aposDocs index: key_1_lang_1 dup key: { key: "test", lang: "en-US" }/);
+        // Syntax varies between mongo versions
+        expect(error).to.match(/E11000/);
+        expect(error).to.match(/key_1_lang_1/);
       }
     });
 
