@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const { expect } = require('chai');
 const rp = require('request-promise');
 const { promisify } = require('util');
-const sleep = require('./lib/sleep');
 
 let apos;
 let req;
@@ -75,8 +74,7 @@ describe('Apostrophe-i18n-static', function() {
       // see configuration in appWithoutAutoReload.js
       await rp('http://localhost:9999');
       const file = JSON.parse(await asyncReadFile('./test/locales/en-US.json', { encoding: 'utf8' }));
-      console.log('FILE CONTAINS:', file);
-      expect(file).to.have.property('test2', 'test');
+      expect(file).to.not.have.property('test2', 'test');
     });
   });
 });

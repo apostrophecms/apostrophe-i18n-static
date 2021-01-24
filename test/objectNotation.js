@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const { expect } = require('chai');
 const rp = require('request-promise');
 const { promisify } = require('util');
-const sleep = require('./lib/sleep');
 
 let apos;
 
