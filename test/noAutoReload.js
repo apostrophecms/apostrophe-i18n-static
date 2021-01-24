@@ -13,8 +13,8 @@ describe('Apostrophe-i18n-static', function() {
     const destroy = require('util').promisify(require('apostrophe/test-lib/util').destroy);
     await destroy(apos);
     await sleep(1000);
-    await fs.remove('./test/locales');
-    await fs.remove('./test/data');
+    fs.removeSync('./test/locales');
+    fs.removeSync('./test/data');
   });
 
   describe('#no auto reload', function() {
