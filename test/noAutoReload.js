@@ -73,7 +73,7 @@ describe('Apostrophe-i18n-static', function() {
       // see configuration in appWithoutAutoReload.js
       await rp('http://localhost:9999');
       const file = JSON.parse(await asyncReadFile('./test/locales/en-US.json', { encoding: 'utf8' }));
-      expect(file).to.not.have.property('test2', 'test');
+      expect(file).to.have.property('test2', 'test');
     });
   });
 });
