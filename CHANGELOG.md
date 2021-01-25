@@ -15,6 +15,8 @@
 
 * Use an admin `req` to insert phrase pieces, as normally an anonymous site visitor who happens to be the first to encounter a phrase would not be able to do that.
 
+* Fully compatible with `apos.destroy`; waits for any outstanding piece inserts to complete before allowing destroy to continue, providing predictable behavior when shutting down in tests or elsewhere.
+
 ## 1.1.2 - 12-02-2020
 
 Fixed "verbose" option while generating a file.
