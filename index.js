@@ -100,6 +100,7 @@ module.exports = {
     };
 
     self.beforeInsert = (req, piece, options, callback) => {
+      console.log('INSERTING:', piece.key);
       piece.title = piece.key;
       piece.published = true;
       piece.slug = self.apos.utils.slugify(piece.key + '-' + piece.lang);
