@@ -10,7 +10,7 @@ module.exports = {
   personas: false,
   sitemap: false,
   moogBundle: {
-    modules: ['apostrophe-i18n-templates'],
+    modules: [ 'apostrophe-i18n-templates' ],
     directory: 'lib/modules'
   },
 
@@ -45,13 +45,13 @@ module.exports = {
       ...(options.addFields || [])
     ];
 
-    options.removeFields = ['slug', 'tags', 'published', 'title', ...(options.removeFields || [])];
+    options.removeFields = [ 'slug', 'tags', 'published', 'title', ...(options.removeFields || []) ];
 
     options.arrangeFields = [
       {
         name: 'basics',
         label: 'Basics',
-        fields: ['lang', 'key', 'title', 'valueSingular', 'valuePlural', 'trash']
+        fields: [ 'lang', 'key', 'title', 'valueSingular', 'valuePlural', 'trash' ]
       },
       ...(options.arrangeFields || [])
     ];
@@ -86,8 +86,7 @@ module.exports = {
     ];
   },
 
-  async construct(self, options) {
-    const i18nCache = self.apos.caches.get('i18n-static');
+  construct(self, options) {
 
     self.getLocale = req => self.apos.modules['apostrophe-workflow'] ? req.locale.replace(/-draft$/, '') : req.locale;
 
@@ -109,6 +108,10 @@ module.exports = {
     };
 
     self.afterSave = async (req, piece, options, callback) => {
+      return self.updateGeneration(req, piece, callback);
+    };
+
+    self.updateGeneration = async function(req, piece, callback) {
       try {
         // update global doc with random number to compare it with the next req
         // see expressMiddleware in this file
@@ -116,11 +119,18 @@ module.exports = {
         const query = { type: 'apostrophe-global' };
 
         if (self.apos.modules['apostrophe-workflow']) {
-          query.workflowLocale = { $in: [piece.lang, piece.lang + '-draft'] };
+          query.workflowLocale = {
+            $in: [
+              piece.lang, piece.lang + '-draft'
+            ]
+          };
         }
         await self.apos.docs.db.updateMany(query, { $set: { i18nGeneration } });
-        await i18nCache.set(piece.lang, {});
-
+        await self.db.update({
+          _id: piece.lang
+        }, {
+          translations: {}
+        }, { upsert: true });
         return callback();
       } catch (error) {
         return callback(error);
@@ -135,7 +145,10 @@ module.exports = {
       self.lastI18nGeneration = self.lastI18nGeneration || {};
       req.data.global.i18nGeneration = (typeof req.data.global.i18nGeneration === 'string') ? req.data.global.i18nGeneration : '';
       if (options.autoReload && self.lastI18nGeneration[locale] !== req.data.global.i18nGeneration) {
-        await saveI18nFile({ locale, ...options });
+        await saveI18nFile({
+          locale,
+          ...options
+        });
       }
       self.lastI18nGeneration[locale] = req.data.global.i18nGeneration;
       next();
@@ -149,21 +162,28 @@ module.exports = {
             console.log('Generating i18n file for', inspect(argv.locale, { colors: true }));
           }
 
-          let translations = await i18nCache.get(argv.locale) || {};
+          const record = await self.db.findOne({ _id: argv.locale });
+          let translations = (record && record.translations) || {};
           const localesDir = self.apos.modules['apostrophe-i18n'].options.directory;
           const file = localesDir + '/' + argv.locale + '.json';
           await fs.ensureFile(file);
 
-          // create cache
           if (Object.entries(translations).length === 0) {
             const req = self.apos.tasks.getAnonReq();
             const pieces = await self
-              .find(req, { published: true, lang: argv.locale }, { key: 1, valueSingular: 1, valuePlural: 1 })
+              .find(req, {
+                published: true,
+                lang: argv.locale
+              }, {
+                key: 1,
+                valueSingular: 1,
+                valuePlural: 1
+              })
               .toArray();
             translations = translatePieces(pieces);
 
             if (Object.entries(translations).length) { // avoid duplicate key error if empty
-              await i18nCache.set(argv.locale, translations);
+              await self.db.update({ _id: argv.locale }, { translations }, { upsert: true });
             }
           }
 
@@ -192,16 +212,19 @@ module.exports = {
         }
         return obj;
       };
-
-      return pieces.reduce((acc, cur) => {
-        const keys = options.objectNotation ? cur.key.split(options.objectNotation) : [cur.key];
+      const result = pieces.reduce((acc, cur) => {
+        const keys = options.objectNotation ? cur.key.split(options.objectNotation) : [ cur.key ];
 
         if (cur.valuePlural) {
-          return nest(acc, keys, { one: cur.valueSingular, other: cur.valuePlural });
+          return nest(acc, keys, {
+            one: cur.valueSingular,
+            other: cur.valuePlural
+          });
         } else {
           return nest(acc, keys, cur.valueSingular);
         }
       }, {});
+      return result;
     }
 
     function flattenedLocales(parentLocales = [], flattenedLocalesArray = []) {
@@ -245,9 +268,22 @@ module.exports = {
         autoReload: options.autoReload,
         defaultLocale: options.defaultLocale,
         objectNotation: options.objectNotation,
-        locales: options.locales.map(lang => lang.value)
+        locales: options.locales.map(lang => lang.value),
+        // Not the job of the i18n module anymore. We
+        // take care of spotting new phrases and writing
+        // new JSON files
+        updateFiles: false
       };
       self.apos.i18n.configure(i18nOptions);
+    });
+
+    // Before we generate the JSONs, we need to exclude the type from workflow,
+    // or the queries will fail
+    self.on('apostrophe:modulesReady', 'excludeType', () => {
+      const workflow = self.apos.modules['apostrophe-workflow'];
+      if (workflow) {
+        workflow.excludeTypes.push(self.name);
+      }
     });
 
     self.on('apostrophe:modulesReady', 'generateJSONs', async function() {
@@ -256,7 +292,10 @@ module.exports = {
           console.time('Total time');
         }
         for (const lang of options.locales) {
-          await saveI18nFile({ locale: lang.value, verbose: options.verbose });
+          await saveI18nFile({
+            locale: lang.value,
+            verbose: options.verbose
+          });
         }
         if (options.verbose) {
           console.timeEnd('Total time');
@@ -264,17 +303,14 @@ module.exports = {
       }
     });
 
-    /* apostrophe-workflow exclusion start */
-    self.on('apostrophe:modulesReady', 'excludeType', () => {
-      const workflow = self.apos.modules['apostrophe-workflow'];
-      if (workflow) {
-        workflow.excludeTypes.push(self.name);
-      }
-    });
-    /* apostrophe-workflow exclusion end */
-
     self.on('apostrophe:migrate', 'createIndex', function () {
-      return self.apos.docs.db.createIndex({ key: 1, lang: 1 }, { unique: true, partialFilterExpression: { type: self.name } });
+      return self.apos.docs.db.createIndex({
+        key: 1,
+        lang: 1
+      }, {
+        unique: true,
+        partialFilterExpression: { type: self.name }
+      });
     });
 
     self.addTask(
@@ -286,9 +322,24 @@ module.exports = {
     self.addTask('reload-all', 'Reload all i18n files', async () => {
       console.time('Total time');
       for (const lang of options.locales) {
-        await saveI18nFile({ locale: lang.value, verbose: true });
+        await saveI18nFile({
+          locale: lang.value,
+          verbose: true
+        });
       }
       console.timeEnd('Total time');
     });
+
+    self.enableCollection = function(callback) {
+      return self.apos.db.collection('aposI18nStaticTranslations', function(err, collection) {
+        self.db = collection;
+        return callback(err);
+      });
+    };
+
+  },
+
+  async afterConstruct(self, callback) {
+    return self.enableCollection(callback);
   }
 };

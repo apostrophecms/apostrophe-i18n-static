@@ -9,3 +9,4 @@ nginx/logs
 test/public
 test/lib/modules/apostrophe-i18n-static
 package-lock.json
+test/locales
