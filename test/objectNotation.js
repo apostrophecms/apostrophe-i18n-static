@@ -8,7 +8,9 @@ let apos;
 describe('Apostrophe-i18n-static', function() {
 
   after(async () => {
-    const destroy = require('util').promisify(require('apostrophe/test-lib/util').destroy);
+    const destroy = promisify(require('apostrophe/test-lib/util').destroy);
+    const drain = promisify(apos.templates.i18nStaticFlush);
+    await drain();
     await destroy(apos);
     fs.removeSync('./test/locales');
     fs.removeSync('./test/data');
