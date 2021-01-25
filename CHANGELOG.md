@@ -9,6 +9,8 @@
 
 * Leaves database schema alone when starting up with migrations disabled.
 
+* Disable `updateFiles` in the `i18n` npm module, as that is now our job and led to test failures and confusing behavior.
+
 ## 1.1.2 - 12-02-2020
 
 Fixed "verbose" option while generating a file.

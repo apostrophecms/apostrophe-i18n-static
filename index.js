@@ -268,7 +268,11 @@ module.exports = {
         autoReload: options.autoReload,
         defaultLocale: options.defaultLocale,
         objectNotation: options.objectNotation,
-        locales: options.locales.map(lang => lang.value)
+        locales: options.locales.map(lang => lang.value),
+        // Not the job of the i18n module anymore. We
+        // take care of spotting new phrases and writing
+        // new JSON files
+        updateFiles: false
       };
       self.apos.i18n.configure(i18nOptions);
     });
