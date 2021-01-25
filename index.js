@@ -212,8 +212,7 @@ module.exports = {
         }
         return obj;
       };
-
-      return pieces.reduce((acc, cur) => {
+      const result = pieces.reduce((acc, cur) => {
         const keys = options.objectNotation ? cur.key.split(options.objectNotation) : [ cur.key ];
 
         if (cur.valuePlural) {
@@ -225,6 +224,7 @@ module.exports = {
           return nest(acc, keys, cur.valueSingular);
         }
       }, {});
+      return result;
     }
 
     function flattenedLocales(parentLocales = [], flattenedLocalesArray = []) {

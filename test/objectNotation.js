@@ -57,9 +57,18 @@ describe('Apostrophe-i18n-static', function() {
     it('should convert object notation string to nested object in JSON file', async function () {
       const asyncReadFile = promisify(fs.readFile);
 
+      // First request: starts inserting pieces in background
+      await rp('http://localhost:9999/object');
+      // Allow pieces to insert in background
+      await sleep(1000);
+      // Second request: triggers new JSON files
       await rp('http://localhost:9999/object');
       const file = JSON.parse(await asyncReadFile('./test/locales/en-US.json', { encoding: 'utf8' }));
       expect(file).to.have.deep.property('deep', { nested: { val: 'nested value' } });
     });
   });
 });
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
