@@ -138,6 +138,32 @@ module.exports = {
     };
 
     self.expressMiddleware = async (req, res, next) => {
+
+      // Apply super pattern to i18n methods of req and res so that
+      // calls made directly on them still find the right localizations
+      const methods = [ '__ns', '__ns_n', '__ns_mf', '__ns_l', '__ns_h', '__', '__n', '__mf', '__l', '__h' ];
+      for (const name of methods) {
+        const _super = req[name];
+        req[name] = function(...args) {
+          const savedLocale = req.locale;
+          req.locale = self.apos.modules['apostrophe-i18n-static'].getLocale(req);
+          const result = _super.apply(req, args);
+          req.locale = savedLocale;
+          return result;
+        };
+      }
+      for (const name of methods) {
+        const _super = res[name];
+        res[name] = function(...args) {
+          const savedLocale = res.locale;
+          // yes, req is correct in call to getLocale
+          res.locale = self.apos.modules['apostrophe-i18n-static'].getLocale(req);
+          const result = _super.apply(res, args);
+          res.locale = savedLocale;
+          return result;
+        };
+      }
+
       // compare i18n number in req and in global
       // if they don't match, it means a language had a translation piece edited
       // so need to reload this i18n language file
