@@ -1,7 +1,10 @@
 # CHANGELOG
 
+## 1.2.1 - 01-27-2021
 
-## 1.2.0 - 01-27-2021
+* Solves an issue where only default locale strings were obtained by `req.__()` when editing in draft mode with the workflow module. Since this module does not write `-draft` locale JSON files, make sure `apos.templates.i18n` sees only the base locale name, but take care to restore `req.locale` and `req.res.locale` afterwards to avoid any issues for the workflow module.
+
+## 1.2.0 - 01-25-2021
 
 * Collection used rather than cache to avoid issues when the database is shared between environments but the cache is not.
 
