@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.2.3 - 02-25-2021
+
+* Crash fix on duplicate key inserts
+* Efficient indexes
+* Efficiency on first page load (prevent redundant find calls)
+
 ## 1.2.2 - 01-27-2021
 
 * Further corrections to phrase lookup in draft mode, to address the issue earlier in middleware.
