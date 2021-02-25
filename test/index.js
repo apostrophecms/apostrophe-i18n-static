@@ -67,8 +67,8 @@ describe('Apostrophe-i18n-static', function() {
 
     it('should create an index', async() => {
       const indexes = await apos.docs.db.listIndexes().toArray();
-      const indexExists = await apos.docs.db.indexExists('key_1_lang_1');
-      const index = indexes.find(i => (i.name = 'key_1_lang_1' && i.partialFilterExpression));
+      const indexExists = await apos.docs.db.indexExists('lang_1_key_1');
+      const index = indexes.find(i => (i.name = 'lang_1_key_1' && i.partialFilterExpression));
 
       expect(indexExists).to.be.true; // eslint-disable-line no-unused-expressions
       expect(index).to.be.an('object').that.has.any.keys('unique', 'partialFilterExpression');
@@ -106,7 +106,7 @@ describe('Apostrophe-i18n-static', function() {
       } catch (error) {
         // Syntax varies between mongo versions
         expect(error).to.match(/E11000/);
-        expect(error).to.match(/key_1_lang_1/);
+        expect(error).to.match(/lang_1_key_1/);
       }
     });
 

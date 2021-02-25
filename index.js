@@ -329,14 +329,25 @@ module.exports = {
       }
     });
 
-    self.on('apostrophe:migrate', 'createIndex', function () {
+    // Establish the new index first so we have unique key coverage
+    // before we remove the inefficient one
+    self.on('apostrophe:migrate', 'createEfficientIndex', function () {
       return self.apos.docs.db.createIndex({
-        key: 1,
-        lang: 1
+        lang: 1,
+        key: 1
       }, {
         unique: true,
         partialFilterExpression: { type: self.name }
       });
+    });
+
+    self.on('apostrophe:migrate', 'removeInefficientIndex', async () => {
+      try {
+        await self.apos.docs.db.dropIndex('key_1_lang_1');
+      } catch (e) {
+        // This is OK, it means the inefficient legacy index never existed
+        // in this particular project
+      }
     });
 
     self.addTask(
